@@ -6,18 +6,27 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
-fun MainScreen() {
-    Column(modifier = Modifier.fillMaxSize()) {
+fun MainScreen(
+    modifier: Modifier = Modifier,
+    vm: MainScreenViewModel = hiltViewModel(),
+) {
+    val habits by vm.habits.collectAsStateWithLifecycle()
+    Column(modifier = modifier.fillMaxSize()) {
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = "Habits",
             style = MaterialTheme.typography.displayMedium
         )
-        HabitRow()
+        habits.forEach {
+            HabitRow(it)
+        }
     }
 }
 

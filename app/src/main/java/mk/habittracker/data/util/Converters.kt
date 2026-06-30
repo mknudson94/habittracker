@@ -1,10 +1,13 @@
 package mk.habittracker.data.util
 
+import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
 import java.time.LocalDate
 import java.time.ZoneId
+import javax.inject.Inject
 
-public class Converters {
+@ProvidedTypeConverter
+class Converters @Inject constructor() {
     @TypeConverter
     fun fromLocalDate(value: LocalDate?): String? = value?.toString()
 
