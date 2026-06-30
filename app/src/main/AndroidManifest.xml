@@ -10,7 +10,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.HabitTracker">
+        android:theme="@style/Theme.HabitTracker"
+        android:name="mk.habittracker.HabitTrackerApp">
         <activity
             android:name="mk.habittracker.MainActivity"
             android:exported="true"
