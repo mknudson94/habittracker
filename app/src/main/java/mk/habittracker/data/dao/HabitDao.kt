@@ -12,6 +12,12 @@ interface HabitDao {
     @Insert
     fun addHabit(habit: Habit)
 
+    @Query("SELECT * FROM habit " +
+            "WHERE :userId = habit.user_id " +
+            "AND :habitId = habit.id"
+    )
+    fun getHabit(userId: Int, habitId: Int): Flow<Habit>
+
     @Query(
         "SELECT * FROM check_in " +
             "WHERE :habitId = check_in.habit_id " +

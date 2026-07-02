@@ -1,5 +1,6 @@
 package mk.habittracker.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import mk.habittracker.data.model.CheckIn
 import mk.habittracker.data.model.Habit
 import java.time.LocalDate
 import kotlin.random.Random
@@ -25,12 +25,13 @@ import kotlin.random.Random
 @Composable
 fun HabitRow(
     habit: Habit,
+    onClick: () -> Unit = {},
     vm: MainScreenViewModel = hiltViewModel()
 ) {
     val checkIns by vm.getCheckIns(
         habitId = habit.id
     ).collectAsStateWithLifecycle()
-    Column {
+    Column(modifier = Modifier.clickable(onClick = onClick)) {
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
