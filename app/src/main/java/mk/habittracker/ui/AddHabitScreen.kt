@@ -37,6 +37,7 @@ fun AddHabitScreen(
     onDismiss: () -> Unit
 ) {
     val nfcBottomSheetState = rememberModalBottomSheetState()
+    // TODO: use scope to close sheet state - https://developer.android.com/develop/ui/compose/components/bottom-sheets#control-sheet-state
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
 
@@ -47,6 +48,7 @@ fun AddHabitScreen(
         Column {
             Text("Add habit", style = MaterialTheme.typography.displayMedium)
         }
+        // TODO: hide this when device not NFC capable
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = { showBottomSheet = true}
