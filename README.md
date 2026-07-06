@@ -54,11 +54,10 @@ The app currently uses Navigation 3 with `MainScreen` as the start route. From t
 
 ## TODO
 
-- maybe unify add NFC tag bottom sheet?
-- create NFC listener to register tag
-- create NFC listener to add a check-in on read
-- tests
-- create repository abstraction for db
-- remote data source
-- streak calculator
-- 
+- [ ] maybe unify add NFC tag bottom sheet?
+- [ ] create NFC listener to register tag
+- [ ] create NFC listener to add a check-in on read
+- [ ] tests
+- [ ] create repository abstraction for db
+- [ ] remote data source
+- [ ] streak calculator

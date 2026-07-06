@@ -36,7 +36,7 @@ class AppModule {
                 object: RoomDatabase.Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         super.onCreate(db)
-                        seedDatabase(context, db)
+//                        seedDatabase(context, db)
                     }
                 }
             )
