@@ -61,3 +61,7 @@ The app currently uses Navigation 3 with `MainScreen` as the start route. From t
 - [ ] create repository abstraction for db
 - [ ] remote data source
 - [ ] streak calculator
+
+
+## nfc notes
+"ready to scan - hold your device near the nfc tag"
