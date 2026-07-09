@@ -14,10 +14,15 @@ import mk.habittracker.data.dao.HabitDao
 import mk.habittracker.data.dao.UserDao
 import mk.habittracker.data.database.AppDatabase
 import mk.habittracker.data.util.Converters
+import mk.habittracker.nfc.NfcModule
 import java.io.IOException
 import javax.inject.Singleton
 
-@Module
+@Module(
+    includes = [
+        NfcModule::class,
+    ]
+)
 @InstallIn(SingletonComponent::class)
 class AppModule {
     @Provides

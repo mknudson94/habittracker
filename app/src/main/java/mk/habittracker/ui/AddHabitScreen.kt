@@ -37,8 +37,6 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
-private const val TAG = "nfc"
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddHabitScreen(
@@ -114,28 +112,6 @@ private fun NfcBottomSheet(
 ) {
     val vm = hiltViewModel<AddHabitViewModel>()
     val state by vm.pairingState.collectAsStateWithLifecycle()
-    val activity = LocalActivity.current
-
-    if (state == PairNfcTagState.ReadyToScan) {
-        DisposableEffect(state) {
-            Log.d(TAG, "enabling reader mode")
-            activity?.let { vm.prepareToPair(it) }
-            onDispose {
-                Log.d(TAG, "disabling reader mode")
-                activity?.let { vm.disableReaderMode(it) }
-            }
-        }
-    }
-    if ((state as? PairNfcTagState.ConfirmOverwrite)?.confirmed == true) {
-        DisposableEffect(state) {
-            Log.d(TAG, "enabling reader mode")
-            activity?.let { vm.prepareToOverwrite(it) }
-            onDispose {
-                Log.d(TAG, "disabling reader mode")
-                activity?.let { vm.disableReaderMode(it) }
-            }
-        }
-    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,

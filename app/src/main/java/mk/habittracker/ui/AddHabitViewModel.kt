@@ -1,25 +1,25 @@
 package mk.habittracker.ui
 
-import android.app.Activity
-import android.nfc.FormatException
 import android.nfc.NdefMessage
 import android.nfc.NdefRecord
-import android.nfc.NfcAdapter.*
-import android.nfc.Tag
-import android.nfc.TagLostException
-import android.nfc.tech.Ndef
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import mk.habittracker.WriteNfcResult
+import mk.habittracker.WriteNfcTagUseCase
 import mk.habittracker.data.model.Habit
+import mk.habittracker.nfc.TagBus
 import mk.habittracker.ui.PairNfcTagState.ConfirmOverwrite
 import mk.habittracker.ui.PairNfcTagState.Error
 import mk.habittracker.ui.PairNfcTagState.Idle
 import mk.habittracker.ui.PairNfcTagState.ReadyToScan
 import mk.habittracker.ui.PairNfcTagState.Success
-import java.io.IOException
 import java.time.Instant
 import javax.inject.Inject
 import kotlin.random.Random
@@ -36,10 +36,10 @@ sealed class PairNfcTagState {
     data object Success : PairNfcTagState()
 }
 
-private const val flags = FLAG_READER_NFC_A or FLAG_READER_NFC_B or FLAG_READER_NFC_F or FLAG_READER_NFC_V or FLAG_READER_NFC_BARCODE
-
 @HiltViewModel
 class AddHabitViewModel @Inject constructor(
+    private val tagBus: TagBus,
+    private val writeNfcTagUseCase: WriteNfcTagUseCase,
 ) : ViewModel() {
     private val _pairingState = MutableStateFlow<PairNfcTagState>(ReadyToScan)
     val pairingState = _pairingState.asStateFlow()
@@ -51,74 +51,57 @@ class AddHabitViewModel @Inject constructor(
         createdAt = Instant.now().toEpochMilli()
     )
 
-    // todo: refactor away from activity in VM
-    fun prepareToPair(activity: Activity) {
-        val nfcAdapter = getDefaultAdapter(activity)
-        nfcAdapter.enableReaderMode(activity, initialPairingCallback, flags, null)
+    private var writeNfcTagJob: Job? = null
+
+    private fun startWriteNfcTagJob() {
+        if (writeNfcTagJob?.isActive == true) return
+        writeNfcTagJob = tagBus.tags
+            .onEach { tag ->
+                Log.d("nfc", "[AddHabitViewModel#tags.onEach] received tag from bus")
+                val result = writeNfcTagUseCase.execute(
+                    tag = tag,
+                    message = buildMessage(),
+                    shouldOverwrite = (_pairingState.value as? ConfirmOverwrite)?.confirmed == true,
+                )
+                _pairingState.value = when (result) {
+                    WriteNfcResult.Success -> Success
+                    WriteNfcResult.DidNotOverwrite -> ConfirmOverwrite()
+                    is WriteNfcResult.Error -> Error(result.message)
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    init {
+        Log.d("nfc", "[AddHabitViewModel#init]")
+        _pairingState
+            .onEach {
+                when (it) {
+                    ReadyToScan -> {
+                        Log.d("nfc", "[AddHabitViewModel#init] starting write job")
+                        startWriteNfcTagJob()
+                    }
+                    is ConfirmOverwrite -> {
+                        if (it.confirmed) {
+                            Log.d("nfc", "[AddHabitViewModel#init] starting re-write job")
+                            startWriteNfcTagJob()
+                        } else {
+                            Log.d("nfc", "[AddHabitViewModel#init] canceling write job")
+                            writeNfcTagJob?.cancel()
+                        }
+                    }
+                    is Error, Idle, Success -> {
+                        Log.d("nfc", "[AddHabitViewModel#init] canceling write job")
+                        writeNfcTagJob?.cancel()
+                    }
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     fun confirmOverwrite() {
-        check(_pairingState.value is ConfirmOverwrite)
+        require(_pairingState.value is ConfirmOverwrite)
         _pairingState.value = (_pairingState.value as ConfirmOverwrite).copy(confirmed = true)
-    }
-
-    fun prepareToOverwrite(activity: Activity) {
-        val nfcAdapter = getDefaultAdapter(activity)
-        nfcAdapter.enableReaderMode(activity, overwriteCallback, flags, null)
-    }
-
-    fun disableReaderMode(activity: Activity) {
-        val nfcAdapter = getDefaultAdapter(activity)
-        nfcAdapter.disableReaderMode(activity)
-    }
-
-
-    private val initialPairingCallback = ReaderCallback { tag ->
-        val ndef = Ndef.get(tag)
-        if (ndef == null) {
-            _pairingState.value = Error("Tag is not NDEF formatted")
-        }
-        try {
-            ndef.connect()
-
-            if (!ndef.isWritable) {
-                _pairingState.value = Error("This tag is read-only")
-            }
-
-            when {
-                ndef.isBlank() -> {
-                    ndef.writeNdefMessage(buildMessage())
-                    _pairingState.value = Success
-                }
-
-                else -> {
-                    _pairingState.value = ConfirmOverwrite()
-                }
-            }
-        } catch (e: IOException) {
-            // if there is an I/O failure, or connect is canceled
-            Log.e("nfc", e.toString())
-        } catch (e: TagLostException) {
-            // if the tag leaves the field
-            Log.e("nfc", e.toString())
-        } catch (e: SecurityException) {
-            // if the tag object is reused after the tag has left the field
-            Log.e("nfc", e.toString())
-        } catch (e: FormatException) {
-            // if the NDEF Message to write is malformed
-            Log.e("nfc", e.toString())
-        }
-    }
-
-    private val overwriteCallback = ReaderCallback { tag ->
-        val ndef = Ndef.get(tag)
-        try {
-            ndef.connect()
-            ndef.writeNdefMessage(buildMessage())
-            _pairingState.value = Success
-        } catch (e: Exception) { // TODO: catch for real
-            Log.e("nfc", e.toString())
-        }
     }
 
     private fun buildMessage(): NdefMessage = NdefMessage(
@@ -130,15 +113,4 @@ class AddHabitViewModel @Inject constructor(
         NdefRecord.createApplicationRecord("com.example.habittracker")
     )
 
-}
-
-
-private fun Ndef.isBlank(): Boolean {
-    val message = cachedNdefMessage ?: ndefMessage
-    if (message == null) return true
-
-    val isWellFormedBlankRecord =
-        message.records.size == 1 && message.records.first().tnf == NdefRecord.TNF_EMPTY
-
-    return  isWellFormedBlankRecord
 }

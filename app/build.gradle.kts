@@ -41,6 +41,8 @@ android {
 }
 
 dependencies {
+    compileOnly(libs.errorprone.annotations)
+
     ksp(libs.androidx.room.compiler)
     ksp(libs.hilt.android.compiler)
 
