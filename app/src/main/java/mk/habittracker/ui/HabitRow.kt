@@ -5,9 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -16,8 +13,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.habittracker.R
+import mk.habittracker.data.model.CheckIn
 import mk.habittracker.data.model.Habit
 import java.time.LocalDate
 import kotlin.random.Random
@@ -31,6 +32,20 @@ fun HabitRow(
     val checkIns by vm.getCheckIns(
         habitId = habit.id
     ).collectAsStateWithLifecycle()
+
+    HabitRow(
+        habit = habit,
+        checkIns = checkIns,
+        onClick = onClick,
+    )
+}
+
+@Composable
+fun HabitRow(
+    habit: Habit,
+    checkIns: List<CheckIn>,
+    onClick: () -> Unit = {},
+) {
     Column(modifier = Modifier.clickable(onClick = onClick)) {
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -59,11 +74,13 @@ fun HabitRow(
             repeat(7) { i ->
                 val day = LocalDate.now().minusDays(6L - i)
                 Icon(
-                    imageVector = if (checkIns.any { it.completedDate == day }) {
-                        Icons.Default.CheckCircle
-                    } else {
-                        Icons.Default.Clear
-                    },
+                    painter = painterResource(
+                        if (checkIns.any { it.completedDate == day }) {
+                            R.drawable.outline_check_circle_24
+                        } else {
+                            R.drawable.outline_close_24
+                        }
+                    ),
                     contentDescription = "checked",
                 )
             }
@@ -72,42 +89,32 @@ fun HabitRow(
 }
 
 @Composable
-fun HabitRow() {
-    Column {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                modifier = Modifier.weight(1f),
-                text = "Drink 8 glasses of water",
+@Preview(showBackground = true)
+private fun HabitRowPreview() {
+    HabitRow(
+        habit = Habit(
+            id = 1,
+            userId = 1,
+            name = "Brush teeth",
+            createdAt = 12345L,
+        ),
+        checkIns = listOf(
+            CheckIn(
+                id = 1,
+                habitId = 1,
+                completedDate = LocalDate.now().minusDays(1)
+            ),
+            CheckIn(
+                id = 1,
+                habitId = 1,
+                completedDate = LocalDate.now().minusDays(3)
+            ),
+            CheckIn(
+                id = 1,
+                habitId = 1,
+                completedDate = LocalDate.now().minusDays(4)
             )
-            Checkbox(
-                checked = false,
-                onCheckedChange = {}
-            )
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround
-        ) {
-            listOf("S", "M", "T", "W", "Th", "F", "Sa").forEach {
-                Text(it, style = MaterialTheme.typography.labelSmall)
-            }
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround
-        ) {
-            repeat(7) {
-                Icon(
-                    imageVector = if (Random.nextBoolean()) {
-                        Icons.Default.CheckCircle
-                    } else {
-                        Icons.Default.Clear
-                    },
-                    contentDescription = "checked",
-                )
-            }
-        }
-    }
+        ),
+        onClick = {},
+    )
 }

@@ -7,29 +7,25 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.test.history
+import com.example.habittracker.R
 
 @Composable
 fun HabitDetailScreen(
@@ -55,7 +51,6 @@ fun HabitDetailScreen(
     nCheckIns: String,
 ) {
     val nfcBottomSheetState = rememberModalBottomSheetState()
-    val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
 
     FullSheet(
@@ -73,27 +68,10 @@ fun HabitDetailScreen(
         }
     }
     if (showBottomSheet) {
-        ModalBottomSheet(
-            onDismissRequest = { showBottomSheet = false },
+        NfcPairingBottomSheet(
             sheetState = nfcBottomSheetState,
-        ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Info, contentDescription = ""
-                )
-                Text("Ready to scan", style = MaterialTheme.typography.displaySmall)
-                Text("Hold your phone near the NFC tag")
-                TextButton(
-                    onClick = { showBottomSheet = false },
-
-                ) {
-                    Text("Cancel")
-                }
-            }
-        }
+            onDismiss = { showBottomSheet = false },
+        )
     }
 }
 
@@ -106,7 +84,7 @@ fun NfcSection(onClick: () -> Unit) {
         Text("PHYSICAL TRIGGER", style = MaterialTheme.typography.titleMedium)
         Row {
             Icon(
-                imageVector = Icons.Default.AddMissing,
+                painter = painterResource(R.drawable.outline_add_link_24),
                 contentDescription = "add nfc tag",
             )
             Column {
@@ -126,7 +104,10 @@ fun HistorySection(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(imageVector = Icons.Default.history, contentDescription = "history icon")
+            Icon(
+                painter = painterResource(R.drawable.outline_history_24),
+                contentDescription = "history icon"
+            )
             Text("Completed $nCheckIns times")
         }
     }
