@@ -29,14 +29,14 @@ fun HabitRow(
     onClick: () -> Unit = {},
     vm: MainScreenViewModel = hiltViewModel()
 ) {
-    val checkIns by vm.getCheckIns(
-        habitId = habit.id
-    ).collectAsStateWithLifecycle()
+    val checkIns by vm.getCheckIns(habitId = habit.id)
+        .collectAsStateWithLifecycle()
 
     HabitRow(
         habit = habit,
         checkIns = checkIns,
         onClick = onClick,
+        onToggleCheckIn = vm::toggleCheckIn,
     )
 }
 
@@ -45,6 +45,7 @@ fun HabitRow(
     habit: Habit,
     checkIns: List<CheckIn>,
     onClick: () -> Unit = {},
+    onToggleCheckIn: (isChecked: Boolean, habitId: String) -> Unit = {_, _ -> },
 ) {
     Column(modifier = Modifier.clickable(onClick = onClick)) {
         Row(
@@ -56,7 +57,9 @@ fun HabitRow(
             )
             Checkbox(
                 checked = checkIns.any { it.completedDate == LocalDate.now() },
-                onCheckedChange = {}
+                onCheckedChange = { isChecked ->
+                    onToggleCheckIn(isChecked, habit.id)
+                }
             )
         }
         Row(

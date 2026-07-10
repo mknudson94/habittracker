@@ -1,16 +1,21 @@
 package mk.habittracker.data.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 import mk.habittracker.data.model.CheckIn
 import mk.habittracker.data.model.Habit
+import java.time.LocalDate
 
 @Dao
 interface HabitDao {
     @Insert
-    fun addHabit(habit: Habit)
+    suspend fun addHabit(habit: Habit)
+
+    @Query("SELECT * FROM habit WHERE :userId = habit.user_id")
+    fun getHabits(userId: String): Flow<List<Habit>>
 
     @Query("SELECT * FROM habit " +
             "WHERE :userId = habit.user_id " +
@@ -25,6 +30,13 @@ interface HabitDao {
     )
     fun getCheckIns(habitId: String): Flow<List<CheckIn>>
 
-    @Query("SELECT * FROM habit WHERE :userId = habit.user_id")
-    fun getHabits(userId: String): Flow<List<Habit>>
+    @Insert
+    suspend fun addCheckIn(checkIn: CheckIn)
+
+    @Query(
+        "DELETE FROM check_in " +
+                "WHERE completed_date = :date " +
+                "AND habit_id = :habitId"
+    )
+    suspend fun deleteCheckIn(habitId: String, date: String)
 }

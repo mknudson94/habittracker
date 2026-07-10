@@ -2,7 +2,9 @@ package mk.habittracker.ui
 
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import mk.habittracker.data.dao.HabitDao
 import mk.habittracker.data.model.Habit
 import javax.inject.Inject
@@ -18,13 +20,15 @@ class AddHabitViewModel @Inject constructor(
     val name = TextFieldState()
 
     fun saveHabit() {
-        habitDao.addHabit(
-            Habit(
-                id = habitId,
-                userId = "1",
-                name = name.text.toString(),
-                createdAt = java.time.Instant.now().toEpochMilli()
+        viewModelScope.launch {
+            habitDao.addHabit(
+                Habit(
+                    id = habitId,
+                    userId = "1",
+                    name = name.text.toString(),
+                    createdAt = java.time.Instant.now().toEpochMilli()
+                )
             )
-        )
+        }
     }
 }

@@ -42,8 +42,6 @@ fun MainScreen(
     onAddHabit: () -> Unit = {},
     onHabitClick: (habitId: String) -> Unit = {},
 ) {
-
-
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
