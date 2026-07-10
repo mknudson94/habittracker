@@ -19,13 +19,13 @@ class MainScreenViewModel @Inject constructor(
     val habitDao: HabitDao
 ): ViewModel() {
 
-    val habits: StateFlow<List<Habit>> = habitDao.getHabits(userId = 1).stateIn(
+    val habits: StateFlow<List<Habit>> = habitDao.getHabits(userId = "1").stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
     )
 
-    fun getCheckIns(habitId: Int) = habitDao.getCheckIns(habitId).stateIn(
+    fun getCheckIns(habitId: String) = habitDao.getCheckIns(habitId).stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
@@ -33,8 +33,8 @@ class MainScreenViewModel @Inject constructor(
 
     fun addHabit(habitName: String) {
         habitDao.addHabit(Habit(
-            id = 1,
-            userId = 1,
+            id = "1",
+            userId = "1",
             name = habitName,
             createdAt = Instant.now().toEpochMilli()
         ))

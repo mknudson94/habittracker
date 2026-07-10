@@ -22,7 +22,8 @@ import mk.habittracker.ui.PairNfcTagState.ReadyToScan
 import mk.habittracker.ui.PairNfcTagState.Success
 import java.time.Instant
 import javax.inject.Inject
-import kotlin.random.Random
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 sealed class PairNfcTagState {
     data object Idle : PairNfcTagState()
@@ -36,6 +37,7 @@ sealed class PairNfcTagState {
     data object Success : PairNfcTagState()
 }
 
+@OptIn(ExperimentalUuidApi::class)
 @HiltViewModel
 class PairNewNfcTagViewModel @Inject constructor(
     private val tagBus: TagBus,
@@ -44,9 +46,10 @@ class PairNewNfcTagViewModel @Inject constructor(
     private val _pairingState = MutableStateFlow<PairNfcTagState>(ReadyToScan)
     val pairingState = _pairingState.asStateFlow()
 
+    // TODO: hoist state
     val pendingHabit = Habit(
-        id = Random.nextInt(),
-        userId = 1,
+        id = Uuid.random().toString(),
+        userId = "1",
         name = "",
         createdAt = Instant.now().toEpochMilli()
     )
@@ -108,7 +111,7 @@ class PairNewNfcTagViewModel @Inject constructor(
         NdefRecord.createExternal(
             "mk.habittracker",
             "habit_tag",
-            pendingHabit.id.toString().toByteArray()
+            pendingHabit.id.toByteArray()
         ),
         NdefRecord.createApplicationRecord("com.example.habittracker")
     )

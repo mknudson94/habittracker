@@ -6,8 +6,8 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "habit")
 data class Habit(
-    @PrimaryKey val id: Int,
-    @ColumnInfo(name = "user_id") val userId: Int,
+    @PrimaryKey val id: String,
+    @ColumnInfo(name = "user_id") val userId: String,
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "created_at") val createdAt: Long,
 )

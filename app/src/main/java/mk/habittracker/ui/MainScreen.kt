@@ -23,7 +23,7 @@ import mk.habittracker.data.model.Habit
 fun MainScreen(
     modifier: Modifier = Modifier,
     onAddHabit: () -> Unit = {},
-    onHabitClick: (habitId: Int) -> Unit = {},
+    onHabitClick: (habitId: String) -> Unit = {},
     vm: MainScreenViewModel = hiltViewModel(),
 ) {
     val habits by vm.habits.collectAsStateWithLifecycle()
@@ -40,7 +40,7 @@ fun MainScreen(
     habits: List<Habit>,
     modifier: Modifier = Modifier,
     onAddHabit: () -> Unit = {},
-    onHabitClick: (habitId: Int) -> Unit = {},
+    onHabitClick: (habitId: String) -> Unit = {},
 ) {
 
 

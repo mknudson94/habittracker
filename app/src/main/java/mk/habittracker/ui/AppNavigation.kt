@@ -19,7 +19,7 @@ data object MainRoute : NavKey
 data object AddHabitRoute : NavKey
 
 @Serializable
-data class HabitDetailRoute(val habitId: Int) : NavKey
+data class HabitDetailRoute(val habitId: String) : NavKey
 
 
 @Composable

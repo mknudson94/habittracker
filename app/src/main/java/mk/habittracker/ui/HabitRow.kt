@@ -93,25 +93,25 @@ fun HabitRow(
 private fun HabitRowPreview() {
     HabitRow(
         habit = Habit(
-            id = 1,
-            userId = 1,
+            id = "1",
+            userId = "1",
             name = "Brush teeth",
             createdAt = 12345L,
         ),
         checkIns = listOf(
             CheckIn(
-                id = 1,
-                habitId = 1,
+                id = "1",
+                habitId = "1",
                 completedDate = LocalDate.now().minusDays(1)
             ),
             CheckIn(
-                id = 1,
-                habitId = 1,
+                id = "1",
+                habitId = "1",
                 completedDate = LocalDate.now().minusDays(3)
             ),
             CheckIn(
-                id = 1,
-                habitId = 1,
+                id = "1",
+                habitId = "1",
                 completedDate = LocalDate.now().minusDays(4)
             )
         ),

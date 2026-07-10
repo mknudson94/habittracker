@@ -7,7 +7,7 @@ import java.time.LocalDate
 
 @Entity(tableName = "check_in")
 data class CheckIn(
-    @PrimaryKey val id: Int,
-    @ColumnInfo(name = "habit_id") val habitId: Int,
+    @PrimaryKey val id: String,
+    @ColumnInfo(name = "habit_id") val habitId: String,
     @ColumnInfo(name = "completed_date") val completedDate: LocalDate
 )

@@ -13,16 +13,16 @@ import mk.habittracker.data.dao.HabitDao
 
 @HiltViewModel(assistedFactory = HabitDetailViewModel.Factory::class)
 class HabitDetailViewModel @AssistedInject constructor(
-    @Assisted val habitId: Int,
+    @Assisted val habitId: String,
     val habitDao: HabitDao,
 ): ViewModel() {
 
     @AssistedFactory
     interface Factory {
-        fun create(habitId: Int): HabitDetailViewModel
+        fun create(habitId: String): HabitDetailViewModel
     }
 
-    val habit = habitDao.getHabit(userId = 1, habitId = habitId).stateIn(
+    val habit = habitDao.getHabit(userId = "1", habitId = habitId).stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = null
