@@ -40,18 +40,20 @@ fun AddHabitScreen(
     vm: AddHabitViewModel = hiltViewModel(),
 ) {
     AddHabitScreen(
-        onDismiss = onDismiss,
+        habitId = vm.habitId,
         nameTextFieldState = vm.name,
         onSaveHabit = vm::saveHabit,
+        onDismiss = onDismiss,
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddHabitScreen(
-    onDismiss: () -> Unit,
+    habitId: String,
     nameTextFieldState: TextFieldState,
     onSaveHabit: () -> Unit,
+    onDismiss: () -> Unit,
 ) {
     val nfcBottomSheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -93,6 +95,7 @@ fun AddHabitScreen(
     }
     if (showBottomSheet) {
         NfcPairingBottomSheet(
+            habitId = habitId,
             sheetState = nfcBottomSheetState,
             onDismiss = { showBottomSheet = false },
         )
@@ -103,8 +106,9 @@ fun AddHabitScreen(
 @Preview(showBackground = true)
 private fun AddHabitScreenPreview() {
     AddHabitScreen(
+        habitId = "",
+        nameTextFieldState = TextFieldState("Brush teeth"),
         onDismiss = {},
         onSaveHabit = {},
-        nameTextFieldState = TextFieldState("Brush teeth")
     )
 }

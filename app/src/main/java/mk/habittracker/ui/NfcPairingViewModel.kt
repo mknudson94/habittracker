@@ -5,6 +5,9 @@ import android.nfc.NdefRecord
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +24,6 @@ import mk.habittracker.ui.PairNfcTagState.Idle
 import mk.habittracker.ui.PairNfcTagState.ReadyToScan
 import mk.habittracker.ui.PairNfcTagState.Success
 import java.time.Instant
-import javax.inject.Inject
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -38,11 +40,18 @@ sealed class PairNfcTagState {
 }
 
 @OptIn(ExperimentalUuidApi::class)
-@HiltViewModel
-class PairNewNfcTagViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = NfcPairingViewModel.Factory::class)
+class NfcPairingViewModel @AssistedInject constructor(
+    @Assisted private val habitId: String,
     private val tagBus: TagBus,
     private val writeNfcTagUseCase: WriteNfcTagUseCase,
 ) : ViewModel() {
+
+    @AssistedFactory
+    interface Factory {
+        fun create(habitId: String): NfcPairingViewModel
+    }
+
     private val _pairingState = MutableStateFlow<PairNfcTagState>(ReadyToScan)
     val pairingState = _pairingState.asStateFlow()
 

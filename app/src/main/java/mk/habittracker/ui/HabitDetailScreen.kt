@@ -36,9 +36,10 @@ fun HabitDetailScreen(
     val nCheckIns by vm.nCheckIns.collectAsStateWithLifecycle()
     habit?.let {
         HabitDetailScreen(
-            onBack = onBack,
+            habitId = vm.habitId,
             title = it.name,
             nCheckIns = nCheckIns,
+            onBack = onBack,
         )
     } ?: Text("error fetching habit with id ${vm.habitId}")
 }
@@ -46,9 +47,10 @@ fun HabitDetailScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HabitDetailScreen(
-    onBack: () -> Unit,
+    habitId: String,
     title: String,
     nCheckIns: String,
+    onBack: () -> Unit,
 ) {
     val nfcBottomSheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -69,6 +71,7 @@ fun HabitDetailScreen(
     }
     if (showBottomSheet) {
         NfcPairingBottomSheet(
+            habitId = habitId,
             sheetState = nfcBottomSheetState,
             onDismiss = { showBottomSheet = false },
         )
@@ -117,8 +120,9 @@ fun HistorySection(
 @Preview(showBackground = true)
 private fun HabitDetailScreenPreview() {
     HabitDetailScreen(
-        onBack = {},
+        habitId = "",
         title = "Drink 8 glasses of water",
         nCheckIns = "2",
+        onBack = {},
     )
 }

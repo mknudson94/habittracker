@@ -21,12 +21,30 @@ import com.example.habittracker.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun NfcPairingBottomSheet(
+    habitId: String,
     sheetState: SheetState,
     onDismiss: () -> Unit,
-    vm: PairNewNfcTagViewModel = hiltViewModel(),
 ) {
-    val state by vm.pairingState.collectAsStateWithLifecycle()
+    val vm = hiltViewModel<NfcPairingViewModel, NfcPairingViewModel.Factory> { factory ->
+        factory.create(habitId)
+    }
+    val pairingState by vm.pairingState.collectAsStateWithLifecycle()
+    NfcPairingBottomSheet(
+        pairingState = pairingState,
+        sheetState = sheetState,
+        onConfirmOverwrite = vm::confirmOverwrite,
+        onDismiss = onDismiss,
+    )
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun NfcPairingBottomSheet(
+    pairingState: PairNfcTagState,
+    sheetState: SheetState,
+    onConfirmOverwrite: () -> Unit,
+    onDismiss: () -> Unit,
+) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
@@ -35,7 +53,7 @@ internal fun NfcPairingBottomSheet(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            when (state) {
+            when (pairingState) {
                 PairNfcTagState.ReadyToScan -> {
                     Icon(
                         painter = painterResource(R.drawable.outline_info_24),
@@ -53,10 +71,10 @@ internal fun NfcPairingBottomSheet(
                         contentDescription = "",
                     )
                     Text("Caution: this will overwrite the current contents of the tag. Are you sure?", style = MaterialTheme.typography.displaySmall)
-                    if ((state as PairNfcTagState.ConfirmOverwrite).confirmed) {
+                    if (pairingState.confirmed) {
                         Text("Hold your phone near the NFC tag")
                     } else {
-                        TextButton(vm::confirmOverwrite) {
+                        TextButton(onConfirmOverwrite) {
                             Text("Yes")
                         }
                     }
@@ -68,7 +86,7 @@ internal fun NfcPairingBottomSheet(
                     Text("success")
                 }
                 is PairNfcTagState.Error -> {
-                    Text("error: ${(state as PairNfcTagState.Error).message}")
+                    Text("error: ${pairingState.message}")
                 }
                 PairNfcTagState.Idle -> { Text("idle") }
             }
