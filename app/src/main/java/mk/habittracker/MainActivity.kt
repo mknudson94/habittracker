@@ -3,10 +3,7 @@ package mk.habittracker
 import android.content.Intent
 import android.nfc.NdefMessage
 import android.nfc.NdefRecord
-import android.nfc.NfcAdapter
 import android.nfc.Tag
-import android.nfc.tech.Ndef
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -41,7 +38,7 @@ class MainActivity : ComponentActivity() {
             nfcCheckInHandler.handleIntent(this@MainActivity.intent)
         }
 
-        Log.d("oncreate", intent.asString())
+        Log.d("onCreate", intent.asString())
 
         lifecycle.addObserver(nfcReaderModeController)
         lifecycle.addObserver(nfcCheckInHandler)

@@ -1,13 +1,11 @@
 package mk.habittracker.data.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 import mk.habittracker.data.model.CheckIn
 import mk.habittracker.data.model.Habit
-import java.time.LocalDate
 
 @Dao
 interface HabitDao {

@@ -16,20 +16,14 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import mk.habittracker.WriteNfcResult
 import mk.habittracker.WriteNfcTagUseCase
-import mk.habittracker.data.model.Habit
 import mk.habittracker.nfc.TagBus
 import mk.habittracker.ui.PairNfcTagState.ConfirmOverwrite
 import mk.habittracker.ui.PairNfcTagState.Error
-import mk.habittracker.ui.PairNfcTagState.Idle
 import mk.habittracker.ui.PairNfcTagState.ReadyToScan
 import mk.habittracker.ui.PairNfcTagState.Success
-import java.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 
 sealed class PairNfcTagState {
-    data object Idle : PairNfcTagState()
-
     data object ReadyToScan : PairNfcTagState()
 
     data class ConfirmOverwrite(val confirmed: Boolean = false) : PairNfcTagState()
@@ -94,7 +88,7 @@ class NfcPairingViewModel @AssistedInject constructor(
                             writeNfcTagJob?.cancel()
                         }
                     }
-                    is Error, Idle, Success -> {
+                    is Error, Success -> {
                         Log.d("nfc", "[AddHabitViewModel#init] canceling write job")
                         writeNfcTagJob?.cancel()
                     }

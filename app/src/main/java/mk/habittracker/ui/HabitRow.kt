@@ -23,7 +23,6 @@ import mk.habittracker.LocalDateUtils
 import mk.habittracker.data.model.CheckIn
 import mk.habittracker.data.model.Habit
 import java.time.LocalDate
-import kotlin.random.Random
 
 @Composable
 fun HabitRow(

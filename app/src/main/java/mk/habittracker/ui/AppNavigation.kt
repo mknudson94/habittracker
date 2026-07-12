@@ -51,7 +51,8 @@ fun AppNavigation() {
                 )
             }
             entry<HabitDetailRoute> { key ->
-                // use assistedDI with vm scoped to entry (not activity) by rVMSNED decorator
+                // use assistedDI with vm scoped to entry (not activity) by
+                // rememberViewModelStoreNavEntryDecorator decorator
                 val vm = hiltViewModel<HabitDetailViewModel, HabitDetailViewModel.Factory>(
                     creationCallback = { it.create(key.habitId) }
                 )
