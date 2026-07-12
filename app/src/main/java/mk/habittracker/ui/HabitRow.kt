@@ -11,6 +11,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -18,6 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.habittracker.R
+import mk.habittracker.LocalDateUtils
 import mk.habittracker.data.model.CheckIn
 import mk.habittracker.data.model.Habit
 import java.time.LocalDate
@@ -29,8 +31,12 @@ fun HabitRow(
     onClick: () -> Unit = {},
     vm: MainScreenViewModel = hiltViewModel()
 ) {
-    val checkIns by vm.getCheckIns(habitId = habit.id)
-        .collectAsStateWithLifecycle()
+    // since getCheckIns is a function that creates a flow (not a flow), we need to
+    // call it once inside a remember block
+    val checkInsFlow = remember(habit.id) {
+        vm.getCheckIns(habit.id)
+    }
+    val checkIns by checkInsFlow.collectAsStateWithLifecycle()
 
     HabitRow(
         habit = habit,
@@ -66,7 +72,7 @@ fun HabitRow(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceAround
         ) {
-            listOf("S", "M", "T", "W", "Th", "F", "Sa").forEach {
+            LocalDateUtils.previousSevenDaysLabels().forEach {
                 Text(it, style = MaterialTheme.typography.labelSmall)
             }
         }

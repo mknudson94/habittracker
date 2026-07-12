@@ -55,14 +55,6 @@ class NfcPairingViewModel @AssistedInject constructor(
     private val _pairingState = MutableStateFlow<PairNfcTagState>(ReadyToScan)
     val pairingState = _pairingState.asStateFlow()
 
-    // TODO: hoist state
-    val pendingHabit = Habit(
-        id = Uuid.random().toString(),
-        userId = "1",
-        name = "",
-        createdAt = Instant.now().toEpochMilli()
-    )
-
     private var writeNfcTagJob: Job? = null
 
     private fun startWriteNfcTagJob() {
@@ -120,7 +112,7 @@ class NfcPairingViewModel @AssistedInject constructor(
         NdefRecord.createExternal(
             "mk.habittracker",
             "habit_tag",
-            pendingHabit.id.toByteArray()
+            habitId.toByteArray()
         ),
         NdefRecord.createApplicationRecord("com.example.habittracker")
     )

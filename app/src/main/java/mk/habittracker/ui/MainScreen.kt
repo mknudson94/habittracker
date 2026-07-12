@@ -11,6 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -63,7 +64,9 @@ fun MainScreen(
                 style = MaterialTheme.typography.displayMedium
             )
             habits.forEach { habit ->
-                HabitRow(habit = habit, onClick = { onHabitClick(habit.id) })
+                key(habit.id) {
+                    HabitRow(habit = habit, onClick = { onHabitClick(habit.id) })
+                }
             }
         }
     }

@@ -1,33 +1,50 @@
 package mk.habittracker
 
+import android.content.Intent
 import android.nfc.NdefMessage
 import android.nfc.NdefRecord
+import android.nfc.NfcAdapter
 import android.nfc.Tag
-import android.nfc.tech.TagTechnology
+import android.nfc.tech.Ndef
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.collection.intListOf
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mk.habittracker.nfc.NfcReaderModeController
-import mk.habittracker.nfc.TagBus
 import mk.habittracker.ui.AppNavigation
 import mk.habittracker.ui.theme.HabitTrackerTheme
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
     @Inject lateinit var nfcReaderModeController: NfcReaderModeController
+    @Inject lateinit var nfcCheckInHandler: NfcCheckInHandler
+
+    override fun onNewIntent(intent: Intent) {
+        Log.d("intent", "handling intent: ${intent.asString()}")
+        super.onNewIntent(intent)
+        setIntent(intent)
+        lifecycleScope.launch {
+            nfcCheckInHandler.handleIntent(intent)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        lifecycleScope.launch {
+            nfcCheckInHandler.handleIntent(this@MainActivity.intent)
+        }
+
+        Log.d("oncreate", intent.asString())
 
         lifecycle.addObserver(nfcReaderModeController)
+        lifecycle.addObserver(nfcCheckInHandler)
 
         enableEdgeToEdge()
         setContent {
@@ -70,4 +87,19 @@ fun createMockTag(message: NdefMessage? = null): Tag {
             /* techExtras */ arrayOf(nfcABundle, ndefBundle),
             /* cookie */ null,
             byteArrayOf(0)) as Tag
+}
+
+fun Intent?.asString(): String {
+    if (this == null) return ""
+    val sb = StringBuilder()
+    sb.append("action: ").append(action)
+        .append(" data: ").append(dataString)
+        .append(" extras: ")
+    val extras = getExtras()
+    if (extras != null) {
+        for (key in extras.keySet()) {
+            sb.append(key).append("=").append(extras.get(key)).append(" ")
+        }
+    }
+    return sb.toString()
 }
