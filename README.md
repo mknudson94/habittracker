@@ -51,17 +51,5 @@ The app currently uses Navigation 3 with `MainScreen` as the start route. From t
 
 - Sample data is stored in `app/src/main/assets/sampleData.sql`.
 - The app uses Hilt, so `HabitTrackerApp` must remain registered as the application class in `AndroidManifest.xml`.
-
-## TODO
-
-- [ ] maybe unify add NFC tag bottom sheet?
-- [ ] create NFC listener to register tag
-- [ ] create NFC listener to add a check-in on read
-- [ ] tests
-- [ ] create repository abstraction for db
-- [ ] remote data source
-- [ ] streak calculator
-
-
-## nfc notes
-"ready to scan - hold your device near the nfc tag"
+scan - hold your device near the nfc tag"
+- 
