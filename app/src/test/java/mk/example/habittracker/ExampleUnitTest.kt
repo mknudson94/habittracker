@@ -1,4 +1,4 @@
-package mk.example.habittracker
+package com.mk.example.habittracker
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
