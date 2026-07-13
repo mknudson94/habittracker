@@ -18,6 +18,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.habittracker.R
 
+@Suppress("ktlint:compose:vm-injection-check")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun NfcPairingBottomSheet(
@@ -25,9 +26,10 @@ internal fun NfcPairingBottomSheet(
     sheetState: SheetState,
     onDismiss: () -> Unit,
 ) {
-    val vm = hiltViewModel<NfcPairingViewModel, NfcPairingViewModel.Factory> { factory ->
-        factory.create(habitId)
-    }
+    val vm =
+        hiltViewModel<NfcPairingViewModel, NfcPairingViewModel.Factory> { factory ->
+            factory.create(habitId)
+        }
     val pairingState by vm.pairingState.collectAsStateWithLifecycle()
     NfcPairingBottomSheet(
         pairingState = pairingState,
@@ -51,7 +53,7 @@ internal fun NfcPairingBottomSheet(
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             when (pairingState) {
                 PairNfcTagState.ReadyToScan -> {
@@ -70,7 +72,11 @@ internal fun NfcPairingBottomSheet(
                         painter = painterResource(R.drawable.outline_warning_24),
                         contentDescription = "",
                     )
-                    Text("Caution: this will overwrite the current contents of the tag. Are you sure?", style = MaterialTheme.typography.displaySmall)
+                    Text(
+                        "Caution: this will overwrite the current contents of the tag. " +
+                            "Are you sure?",
+                        style = MaterialTheme.typography.displaySmall,
+                    )
                     if (pairingState.confirmed) {
                         Text("Hold your phone near the NFC tag")
                     } else {
@@ -88,7 +94,6 @@ internal fun NfcPairingBottomSheet(
                 is PairNfcTagState.Error -> {
                     Text("error: ${pairingState.message}")
                 }
-                PairNfcTagState.Idle -> { Text("idle") }
             }
         }
     }

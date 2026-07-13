@@ -23,10 +23,12 @@ import com.example.habittracker.R
 fun FullSheet(
     title: String,
     onBack: () -> Unit,
+    modifier: Modifier = Modifier,
     footerContent: @Composable (BoxScope.() -> Unit)? = null,
     content: @Composable BoxScope.() -> Unit,
 ) {
     Scaffold(
+        modifier = modifier,
         topBar = {
             TopAppBar(
                 title = { Text(title) },
@@ -42,20 +44,22 @@ fun FullSheet(
         },
     ) { paddingValues ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(horizontal = 16.dp),
         ) {
             content()
 
             footerContent?.let {
                 Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    contentAlignment = Alignment.Center
+                    modifier =
+                        Modifier
+                            .align(Alignment.BottomCenter)
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                    contentAlignment = Alignment.Center,
                 ) {
                     it()
                 }

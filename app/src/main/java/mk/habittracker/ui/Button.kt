@@ -51,14 +51,16 @@ enum class ButtonSize {
     Small,
     Medium,
     Large,
-    ExtraLarge;
+    ExtraLarge,
+    ;
 
     @OptIn(ExperimentalMaterial3ExpressiveApi::class)
-    fun toSizeDp(): Dp = when (this) {
-        ExtraSmall -> ButtonDefaults.ExtraSmallContainerHeight
-        Small -> ButtonDefaults.MinHeight
-        Medium -> ButtonDefaults.MediumContainerHeight
-        Large -> ButtonDefaults.LargeContainerHeight
-        ExtraLarge -> ButtonDefaults.ExtraLargeContainerHeight
-    }
+    fun toSizeDp(): Dp =
+        when (this) {
+            ExtraSmall -> ButtonDefaults.ExtraSmallContainerHeight
+            Small -> ButtonDefaults.MinHeight
+            Medium -> ButtonDefaults.MediumContainerHeight
+            Large -> ButtonDefaults.LargeContainerHeight
+            ExtraLarge -> ButtonDefaults.ExtraLargeContainerHeight
+        }
 }

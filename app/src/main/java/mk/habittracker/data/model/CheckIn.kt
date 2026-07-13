@@ -9,5 +9,5 @@ import java.time.LocalDate
 data class CheckIn(
     @PrimaryKey val id: String,
     @ColumnInfo(name = "habit_id") val habitId: String,
-    @ColumnInfo(name = "completed_date") val completedDate: LocalDate
+    @ColumnInfo(name = "completed_date") val completedDate: LocalDate,
 )

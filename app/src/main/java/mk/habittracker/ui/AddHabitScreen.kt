@@ -45,6 +45,7 @@ fun AddHabitScreen(
     nameTextFieldState: TextFieldState,
     onSaveHabit: () -> Unit,
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val nfcBottomSheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -52,6 +53,7 @@ fun AddHabitScreen(
     FullSheet(
         title = "Add a habit",
         onBack = onDismiss,
+        modifier = modifier,
         footerContent = {
             Button(
                 modifier = Modifier.fillMaxWidth(),
@@ -59,10 +61,10 @@ fun AddHabitScreen(
                 onClick = onSaveHabit,
                 size = ButtonSize.Medium,
             )
-        }
+        },
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             TextField(
                 modifier = Modifier.fillMaxWidth(),
@@ -73,7 +75,7 @@ fun AddHabitScreen(
             // TODO: hide this when device not NFC capable
             Button(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = { showBottomSheet = true }
+                onClick = { showBottomSheet = true },
             ) {
                 Icon(
                     painter = painterResource(R.drawable.outline_build_circle_24),

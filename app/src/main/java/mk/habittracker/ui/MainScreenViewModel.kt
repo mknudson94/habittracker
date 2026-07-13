@@ -3,8 +3,12 @@ package mk.habittracker.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import mk.habittracker.data.dao.HabitDao
@@ -15,38 +19,51 @@ import javax.inject.Inject
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
+const val DEFAULT_STOP_TIMEOUT_MILLIS = 5_000L
+
 @OptIn(ExperimentalUuidApi::class)
 @HiltViewModel
-class MainScreenViewModel @Inject constructor(
-    val habitDao: HabitDao
-): ViewModel() {
-
-    val habits: StateFlow<List<Habit>> = habitDao.getHabits(userId = "1").stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = emptyList()
-    )
-
-    fun getCheckIns(habitId: String) = habitDao.getCheckIns(habitId).stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = emptyList()
-    )
-
-    fun toggleCheckIn(isChecked: Boolean, habitId: String) {
-        viewModelScope.launch {
-            if (isChecked) {
-                habitDao.addCheckIn(
-                    CheckIn(
-                        id = Uuid.random().toString(),
-                        habitId = habitId,
-                        completedDate = LocalDate.now(),
-                    )
+class MainScreenViewModel
+    @Inject
+    constructor(
+        val habitDao: HabitDao,
+    ) : ViewModel() {
+        val habits: StateFlow<ImmutableList<Habit>> =
+            habitDao
+                .getHabits(userId = "1")
+                .map { it.toImmutableList() }
+                .stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(DEFAULT_STOP_TIMEOUT_MILLIS),
+                    initialValue = persistentListOf(),
                 )
-            }
-            else {
-                habitDao.deleteCheckIn(habitId, LocalDate.now().toString())
+
+        fun getCheckIns(habitId: String): StateFlow<ImmutableList<CheckIn>> =
+            habitDao
+                .getCheckIns(habitId)
+                .map { it.toImmutableList() }
+                .stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(DEFAULT_STOP_TIMEOUT_MILLIS),
+                    initialValue = persistentListOf(),
+                )
+
+        fun toggleCheckIn(
+            isChecked: Boolean,
+            habitId: String,
+        ) {
+            viewModelScope.launch {
+                if (isChecked) {
+                    habitDao.addCheckIn(
+                        CheckIn(
+                            id = Uuid.random().toString(),
+                            habitId = habitId,
+                            completedDate = LocalDate.now(),
+                        ),
+                    )
+                } else {
+                    habitDao.deleteCheckIn(habitId, LocalDate.now().toString())
+                }
             }
         }
     }
-}

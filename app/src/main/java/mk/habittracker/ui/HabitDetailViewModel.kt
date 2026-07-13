@@ -12,25 +12,28 @@ import kotlinx.coroutines.flow.stateIn
 import mk.habittracker.data.dao.HabitDao
 
 @HiltViewModel(assistedFactory = HabitDetailViewModel.Factory::class)
-class HabitDetailViewModel @AssistedInject constructor(
-    @Assisted val habitId: String,
-    val habitDao: HabitDao,
-): ViewModel() {
+class HabitDetailViewModel
+    @AssistedInject
+    constructor(
+        @Assisted val habitId: String,
+        val habitDao: HabitDao,
+    ) : ViewModel() {
+        @AssistedFactory
+        interface Factory {
+            fun create(habitId: String): HabitDetailViewModel
+        }
 
-    @AssistedFactory
-    interface Factory {
-        fun create(habitId: String): HabitDetailViewModel
+        val habit =
+            habitDao.getHabit(userId = "1", habitId = habitId).stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(DEFAULT_STOP_TIMEOUT_MILLIS),
+                initialValue = null,
+            )
+
+        val nCheckIns =
+            habitDao.getCheckIns(habitId).map { it.size.toString() }.stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(DEFAULT_STOP_TIMEOUT_MILLIS),
+                initialValue = "?",
+            )
     }
-
-    val habit = habitDao.getHabit(userId = "1", habitId = habitId).stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = null
-    )
-
-    val nCheckIns = habitDao.getCheckIns(habitId).map { it.size.toString() }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = "?"
-    )
-}

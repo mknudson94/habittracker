@@ -14,9 +14,10 @@ import mk.habittracker.data.util.Converters
     entities = [
         User::class,
         Habit::class,
-        CheckIn::class
+        CheckIn::class,
     ],
-    version = 1
+    version = 1,
+    exportSchema = false,
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {

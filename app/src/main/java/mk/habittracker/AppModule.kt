@@ -21,7 +21,7 @@ import javax.inject.Singleton
 @Module(
     includes = [
         NfcModule::class,
-    ]
+    ],
 )
 @InstallIn(SingletonComponent::class)
 class AppModule {
@@ -30,47 +30,47 @@ class AppModule {
     fun provideAppDatabase(
         @ApplicationContext context: Context,
         converters: Converters,
-    ): AppDatabase {
-        return Room.databaseBuilder(
-            context = context,
-            klass = AppDatabase::class.java,
-            name = "app_db"
-        )
-            .addTypeConverter(converters)
+    ): AppDatabase =
+        Room
+            .databaseBuilder(
+                context = context,
+                klass = AppDatabase::class.java,
+                name = "app_db",
+            ).addTypeConverter(converters)
             .addCallback(
-                object: RoomDatabase.Callback() {
+                object : RoomDatabase.Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         super.onCreate(db)
                         seedDatabase(context, db)
                     }
-                }
-            )
-            .build()
-    }
+                },
+            ).build()
 
     @Provides
     @Singleton
-    fun provideUserDao(database: AppDatabase): UserDao {
-        return database.userDao()
-    }
+    fun provideUserDao(database: AppDatabase): UserDao = database.userDao()
 
     @Provides
     @Singleton
-    fun provideHabitDao(database: AppDatabase): HabitDao {
-        return database.habitDao()
-    }
+    fun provideHabitDao(database: AppDatabase): HabitDao = database.habitDao()
 }
 
-private fun seedDatabase(context: Context, db: SupportSQLiteDatabase) {
+@Suppress("NestedBlockDepth")
+private fun seedDatabase(
+    context: Context,
+    db: SupportSQLiteDatabase,
+) {
     try {
         context.assets.open("sampleData.sql").bufferedReader().use { reader ->
-            val statements = reader.readText()
-                .lines()
-                .filterNot { it.trim().startsWith("--") || it.isBlank() }
-                .joinToString("\n")
-                .split(";")
-                .map { it.trim() }
-                .filter { it.isNotEmpty() }
+            val statements =
+                reader
+                    .readText()
+                    .lines()
+                    .filterNot { it.trim().startsWith("--") || it.isBlank() }
+                    .joinToString("\n")
+                    .split(";")
+                    .map { it.trim() }
+                    .filter { it.isNotEmpty() }
 
             db.beginTransaction()
             try {

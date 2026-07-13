@@ -13,22 +13,27 @@ import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
 @HiltViewModel
-class AddHabitViewModel @Inject constructor(
-    private val habitDao: HabitDao,
-): ViewModel() {
-    val habitId = Uuid.random().toString()
-    val name = TextFieldState()
+class AddHabitViewModel
+    @Inject
+    constructor(
+        private val habitDao: HabitDao,
+    ) : ViewModel() {
+        val habitId = Uuid.random().toString()
+        val name = TextFieldState()
 
-    fun saveHabit() {
-        viewModelScope.launch {
-            habitDao.addHabit(
-                Habit(
-                    id = habitId,
-                    userId = "1",
-                    name = name.text.toString(),
-                    createdAt = java.time.Instant.now().toEpochMilli()
+        fun saveHabit() {
+            viewModelScope.launch {
+                habitDao.addHabit(
+                    Habit(
+                        id = habitId,
+                        userId = "1",
+                        name = name.text.toString(),
+                        createdAt =
+                            java.time.Instant
+                                .now()
+                                .toEpochMilli(),
+                    ),
                 )
-            )
+            }
         }
     }
-}

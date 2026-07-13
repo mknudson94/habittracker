@@ -18,6 +18,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.habittracker.R
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import mk.habittracker.data.model.Habit
 
 @Composable
@@ -38,30 +40,34 @@ fun MainScreen(
 
 @Composable
 fun MainScreen(
-    habits: List<Habit>,
+    habits: ImmutableList<Habit>,
     modifier: Modifier = Modifier,
     onAddHabit: () -> Unit = {},
     onHabitClick: (habitId: String) -> Unit = {},
 ) {
     Scaffold(
+        modifier = modifier,
         floatingActionButton = {
             FloatingActionButton(
-                onClick = onAddHabit
+                onClick = onAddHabit,
             ) {
                 Icon(
                     painter = painterResource(R.drawable.outline_add_24),
-                    contentDescription = "add habit"
+                    contentDescription = "add habit",
                 )
             }
-        }
+        },
     ) { paddingValues ->
-        Column(modifier = modifier
-            .padding(paddingValues)
-            .fillMaxSize()) {
+        Column(
+            modifier =
+                Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize(),
+        ) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 text = "Habits",
-                style = MaterialTheme.typography.displayMedium
+                style = MaterialTheme.typography.displayMedium,
             )
             habits.forEach { habit ->
                 key(habit.id) {
@@ -76,7 +82,6 @@ fun MainScreen(
 @Composable
 private fun MainScreenPreview() {
     MainScreen(
-        habits = listOf()
-
+        habits = persistentListOf(),
     )
 }

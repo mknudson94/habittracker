@@ -30,12 +30,14 @@ import com.example.habittracker.R
 @Composable
 fun HabitDetailScreen(
     onBack: () -> Unit,
+    modifier: Modifier = Modifier,
     vm: HabitDetailViewModel = hiltViewModel(),
 ) {
     val habit by vm.habit.collectAsStateWithLifecycle()
     val nCheckIns by vm.nCheckIns.collectAsStateWithLifecycle()
     habit?.let {
         HabitDetailScreen(
+            modifier = modifier,
             habitId = vm.habitId,
             title = it.name,
             nCheckIns = nCheckIns,
@@ -49,13 +51,15 @@ fun HabitDetailScreen(
 fun HabitDetailScreen(
     habitId: String,
     title: String,
-    nCheckIns: String,
     onBack: () -> Unit,
+    nCheckIns: String,
+    modifier: Modifier = Modifier,
 ) {
     val nfcBottomSheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
 
     FullSheet(
+        modifier = modifier,
         title = title,
         onBack = onBack,
     ) {
@@ -64,7 +68,7 @@ fun HabitDetailScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             NfcSection(
-                onClick = { showBottomSheet = true }
+                onClick = { showBottomSheet = true },
             )
             HistorySection(nCheckIns = nCheckIns)
         }
@@ -79,10 +83,12 @@ fun HabitDetailScreen(
 }
 
 @Composable
-fun NfcSection(onClick: () -> Unit) {
-    Card(modifier = Modifier
-        .clickable(onClick = onClick)
-        .fillMaxWidth()
+private fun NfcSection(onClick: () -> Unit) {
+    Card(
+        modifier =
+            Modifier
+                .clickable(onClick = onClick)
+                .fillMaxWidth(),
     ) {
         Text("PHYSICAL TRIGGER", style = MaterialTheme.typography.titleMedium)
         Row {
@@ -99,17 +105,15 @@ fun NfcSection(onClick: () -> Unit) {
 }
 
 @Composable
-fun HistorySection(
-    nCheckIns: String
-) {
+private fun HistorySection(nCheckIns: String) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Text("HISTORY", style = MaterialTheme.typography.titleMedium)
         Row(
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
                 painter = painterResource(R.drawable.outline_history_24),
-                contentDescription = "history icon"
+                contentDescription = "history icon",
             )
             Text("Completed $nCheckIns times")
         }

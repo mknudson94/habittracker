@@ -19,22 +19,27 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.habittracker.R
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import mk.habittracker.LocalDateUtils
 import mk.habittracker.data.model.CheckIn
 import mk.habittracker.data.model.Habit
 import java.time.LocalDate
 
+public const val DAYS_IN_WEEK = 7
+
 @Composable
-fun HabitRow(
+internal fun HabitRow(
     habit: Habit,
     onClick: () -> Unit = {},
-    vm: MainScreenViewModel = hiltViewModel()
+    vm: MainScreenViewModel = hiltViewModel(),
 ) {
     // since getCheckIns is a function that creates a flow (not a flow), we need to
     // call it once inside a remember block
-    val checkInsFlow = remember(habit.id) {
-        vm.getCheckIns(habit.id)
-    }
+    val checkInsFlow =
+        remember(habit.id) {
+            vm.getCheckIns(habit.id)
+        }
     val checkIns by checkInsFlow.collectAsStateWithLifecycle()
 
     HabitRow(
@@ -46,15 +51,15 @@ fun HabitRow(
 }
 
 @Composable
-fun HabitRow(
+internal fun HabitRow(
     habit: Habit,
-    checkIns: List<CheckIn>,
+    checkIns: ImmutableList<CheckIn>,
     onClick: () -> Unit = {},
-    onToggleCheckIn: (isChecked: Boolean, habitId: String) -> Unit = {_, _ -> },
+    onToggleCheckIn: (isChecked: Boolean, habitId: String) -> Unit = { _, _ -> },
 ) {
     Column(modifier = Modifier.clickable(onClick = onClick)) {
         Row(
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 modifier = Modifier.weight(1f),
@@ -64,12 +69,12 @@ fun HabitRow(
                 checked = checkIns.any { it.completedDate == LocalDate.now() },
                 onCheckedChange = { isChecked ->
                     onToggleCheckIn(isChecked, habit.id)
-                }
+                },
             )
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround
+            horizontalArrangement = Arrangement.SpaceAround,
         ) {
             LocalDateUtils.previousSevenDaysLabels().forEach {
                 Text(it, style = MaterialTheme.typography.labelSmall)
@@ -77,18 +82,19 @@ fun HabitRow(
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround
+            horizontalArrangement = Arrangement.SpaceAround,
         ) {
-            repeat(7) { i ->
-                val day = LocalDate.now().minusDays(6L - i)
+            repeat(DAYS_IN_WEEK) { i ->
+                val day = LocalDate.now().minusDays(DAYS_IN_WEEK - (i + 1L))
                 Icon(
-                    painter = painterResource(
-                        if (checkIns.any { it.completedDate == day }) {
-                            R.drawable.outline_check_circle_24
-                        } else {
-                            R.drawable.outline_close_24
-                        }
-                    ),
+                    painter =
+                        painterResource(
+                            if (checkIns.any { it.completedDate == day }) {
+                                R.drawable.outline_check_circle_24
+                            } else {
+                                R.drawable.outline_close_24
+                            },
+                        ),
                     contentDescription = "checked",
                 )
             }
@@ -100,29 +106,31 @@ fun HabitRow(
 @Preview(showBackground = true)
 private fun HabitRowPreview() {
     HabitRow(
-        habit = Habit(
-            id = "1",
-            userId = "1",
-            name = "Brush teeth",
-            createdAt = 12345L,
-        ),
-        checkIns = listOf(
-            CheckIn(
+        habit =
+            Habit(
                 id = "1",
-                habitId = "1",
-                completedDate = LocalDate.now().minusDays(1)
+                userId = "1",
+                name = "Brush teeth",
+                createdAt = 12345L,
             ),
-            CheckIn(
-                id = "1",
-                habitId = "1",
-                completedDate = LocalDate.now().minusDays(3)
+        checkIns =
+            persistentListOf(
+                CheckIn(
+                    id = "1",
+                    habitId = "1",
+                    completedDate = LocalDate.now().minusDays(1),
+                ),
+                CheckIn(
+                    id = "1",
+                    habitId = "1",
+                    completedDate = LocalDate.now().minusDays(3),
+                ),
+                CheckIn(
+                    id = "1",
+                    habitId = "1",
+                    completedDate = LocalDate.now().minusDays(4),
+                ),
             ),
-            CheckIn(
-                id = "1",
-                habitId = "1",
-                completedDate = LocalDate.now().minusDays(4)
-            )
-        ),
         onClick = {},
     )
 }

@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ForbiddenComment:AddHabitScreen.kt$// TODO: hide this when device not NFC capable</ID>
+    <ID>ForbiddenComment:AppNavigation.kt$// TODO: container animation</ID>
+    <ID>NestedBlockDepth:AppModule.kt$private fun seedDatabase(context: Context, db: SupportSQLiteDatabase)</ID>
+    <ID>TooGenericExceptionCaught:WriteNfcTagUseCase.kt$WriteNfcTagUseCase$e: Exception</ID>
+  </CurrentIssues>
+</SmellBaseline>

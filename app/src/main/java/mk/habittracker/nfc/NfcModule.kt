@@ -12,6 +12,7 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 object NfcModule {
     @Provides
-    fun provideNfcAdapter(@ApplicationContext ctx: Context): NfcAdapter? =
-        NfcAdapter.getDefaultAdapter(ctx)
+    fun provideNfcAdapter(
+        @ApplicationContext ctx: Context,
+    ): NfcAdapter? = NfcAdapter.getDefaultAdapter(ctx)
 }
