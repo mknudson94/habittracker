@@ -1,8 +1,11 @@
 package com.mk.habittracker.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
@@ -10,10 +13,13 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.navigation3.ui.NavDisplay
+import com.mk.habittracker.ui.login.LoginScreen
+import com.mk.habittracker.ui.login.LoginViewModel
+import com.mk.habittracker.ui.login.SignupScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object MainRoute : NavKey
+data object HomeRoute : NavKey
 
 @Serializable
 data object AddHabitRoute : NavKey
@@ -23,10 +29,25 @@ data class HabitDetailRoute(
     val habitId: String,
 ) : NavKey
 
+@Serializable
+data object LoginRoute : NavKey
+
+@Serializable
+data object SignupRoute : NavKey
+
 @Suppress("ktlint:compose:vm-injection-check")
 @Composable
-fun AppNavigation() {
-    val backStack = rememberNavBackStack(MainRoute)
+fun AppNavigation(
+    viewModel: LoginViewModel = hiltViewModel(),
+) {
+    val user by viewModel.authState.collectAsStateWithLifecycle()
+
+    // this is all that's needed to drive transitions between login and home
+    val backStack = if (user == null) {
+        rememberNavBackStack(LoginRoute)
+    } else {
+        rememberNavBackStack(HomeRoute)
+    }
 
     NavDisplay(
         backStack = backStack,
@@ -38,10 +59,11 @@ fun AppNavigation() {
             ),
         entryProvider =
             entryProvider {
-                entry<MainRoute> {
+                entry<HomeRoute> {
                     MainScreen(
                         onHabitClick = { backStack.add(HabitDetailRoute(it)) },
                         onAddHabit = { backStack.add(AddHabitRoute) },
+                        onLogout = viewModel::signOut,
                     )
                 }
                 // TODO: container animation
@@ -64,6 +86,16 @@ fun AppNavigation() {
                                 creationCallback = { it.create(key.habitId) },
                             ),
                         onBack = { backStack.removeLastOrNull() },
+                    )
+                }
+                entry<LoginRoute> {
+                    LoginScreen(
+                        onSignupClick = { backStack.add(SignupRoute) },
+                    )
+                }
+                entry<SignupRoute> {
+                    SignupScreen(
+                        onCancel = { backStack.removeLastOrNull() }
                     )
                 }
             },

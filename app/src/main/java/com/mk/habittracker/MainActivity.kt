@@ -11,6 +11,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.collection.intListOf
 import androidx.lifecycle.lifecycleScope
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import com.mk.habittracker.nfc.NfcReaderModeController
@@ -24,6 +27,8 @@ class MainActivity : ComponentActivity() {
 
     @Inject lateinit var nfcCheckInHandler: NfcCheckInHandler
 
+    private lateinit var auth: FirebaseAuth
+
     override fun onNewIntent(intent: Intent) {
         Log.d("intent", "handling intent: ${intent.asString()}")
         super.onNewIntent(intent)
@@ -35,6 +40,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        auth = Firebase.auth
+
         lifecycleScope.launch {
             nfcCheckInHandler.handleIntent(this@MainActivity.intent)
         }
@@ -51,6 +59,12 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    override fun onStart() {
+        super.onStart()
+
+        val currentUser = auth.currentUser
+    }
 }
 
 @Suppress("MagicNumber")
@@ -58,7 +72,7 @@ fun createMockTag(message: NdefMessage? = null): Tag {
     val myNdefMessage =
         message ?: NdefMessage(
             NdefRecord.createExternal(
-                "mk.habittracker",
+                "com.mk.habittracker",
                 "habit_tag",
                 "1".toByteArray(),
             ),

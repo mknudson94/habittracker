@@ -112,7 +112,7 @@ class NfcPairingViewModel
         private fun buildMessage(): NdefMessage =
             NdefMessage(
                 NdefRecord.createExternal(
-                    "mk.habittracker",
+                    "com.mk.habittracker",
                     "habit_tag",
                     habitId.toByteArray(),
                 ),

@@ -58,7 +58,10 @@ class NfcCheckInHandler
             } else {
                 val tag = intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG)
                 Log.d("intent", "tag: $tag")
-                Log.d("intent", "ndef: ${tag?.let { Ndef.get(it) }?.ndefMessage?.records}")
+                val ndef = tag?.let { Ndef.get(it) }
+                ndef?.connect()
+                Log.d("intent", "ndef: ${ndef?.ndefMessage?.records}")
+                ndef?.close()
             }
         }
 
