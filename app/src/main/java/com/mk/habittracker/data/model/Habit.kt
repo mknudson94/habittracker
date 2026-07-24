@@ -11,6 +11,13 @@ data class Habit(
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "created_at") val createdAt: Long,
 ) {
+    fun toMap(): Map<String, Any> = mapOf(
+        "id" to id,
+        "user_id" to userId,
+        "name" to name,
+        "created_at" to createdAt,
+    )
+
     companion object {
         fun from(data: Map<String, Any>?): Habit {
             data!!

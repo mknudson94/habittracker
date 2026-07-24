@@ -2,6 +2,7 @@ package com.mk.habittracker.data.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 import com.mk.habittracker.data.model.CheckIn
@@ -9,10 +10,10 @@ import com.mk.habittracker.data.model.Habit
 
 @Dao
 interface HabitDao {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addHabit(habit: Habit)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addHabits(habits: List<Habit>)
 
     @Query("SELECT * FROM habit WHERE :userId = habit.user_id")
@@ -31,14 +32,15 @@ interface HabitDao {
     @Query(
         "SELECT * FROM check_in " +
             "WHERE :habitId = check_in.habit_id " +
+            "AND :userId = check_in.user_id " +
             "AND julianday('now') - julianday(check_in.completed_date) <= 7",
     )
-    fun getCheckIns(habitId: String): Flow<List<CheckIn>>
+    fun getCheckIns(habitId: String, userId: String): Flow<List<CheckIn>>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addCheckIn(checkIn: CheckIn)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addCheckIns(checkIns: List<CheckIn>)
 
     @Query(

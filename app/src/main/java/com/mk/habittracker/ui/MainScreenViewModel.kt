@@ -13,9 +13,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import com.mk.habittracker.data.dao.HabitDao
 import com.mk.habittracker.data.model.CheckIn
 import com.mk.habittracker.data.model.Habit
+import com.mk.habittracker.data.sync.HabitRepository
 import java.time.LocalDate
 import javax.inject.Inject
 import kotlin.uuid.ExperimentalUuidApi
@@ -28,11 +28,14 @@ const val DEFAULT_STOP_TIMEOUT_MILLIS = 5_000L
 class MainScreenViewModel
     @Inject
     constructor(
-        val habitDao: HabitDao,
+        private val repository: HabitRepository,
     ) : ViewModel() {
+        private val userId: String
+            get() = Firebase.auth.currentUser?.uid ?: "anonymous"
+
         val habits: StateFlow<ImmutableList<Habit>> =
-            habitDao
-                .getHabits(userId = "1")
+            repository
+                .getHabits(userId = userId)
                 .map { it.toImmutableList() }
                 .stateIn(
                     scope = viewModelScope,
@@ -41,8 +44,8 @@ class MainScreenViewModel
                 )
 
         fun getCheckIns(habitId: String): StateFlow<ImmutableList<CheckIn>> =
-            habitDao
-                .getCheckIns(habitId)
+            repository
+                .getCheckIns(habitId, userId)
                 .map { it.toImmutableList() }
                 .stateIn(
                     scope = viewModelScope,
@@ -56,16 +59,16 @@ class MainScreenViewModel
         ) {
             viewModelScope.launch {
                 if (isChecked) {
-                    habitDao.addCheckIn(
+                    repository.addCheckIn(
                         CheckIn(
                             id = Uuid.random().toString(),
                             habitId = habitId,
                             completedDate = LocalDate.now(),
-                            userId = Firebase.auth.currentUser?.uid.orEmpty(),
+                            userId = userId,
                         ),
                     )
                 } else {
-                    habitDao.deleteCheckIn(habitId, LocalDate.now().toString())
+                    repository.deleteCheckIn(habitId, LocalDate.now(), userId)
                 }
             }
         }

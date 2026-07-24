@@ -16,8 +16,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import com.mk.habittracker.data.dao.HabitDao
 import com.mk.habittracker.data.model.CheckIn
+import com.mk.habittracker.data.sync.HabitRepository
 import com.mk.habittracker.nfc.TagBus
 import java.time.LocalDate
 import javax.inject.Inject
@@ -30,10 +30,13 @@ import kotlin.uuid.Uuid
 class NfcCheckInHandler
     @Inject
     constructor(
-        private val habitDao: HabitDao,
+        private val repository: HabitRepository,
         private val tagBus: TagBus,
     ) : DefaultLifecycleObserver {
         private var checkInJob: Job? = null
+
+        private val userId: String
+            get() = Firebase.auth.currentUser?.uid ?: "anonymous"
 
         suspend fun handleIntent(intent: Intent) {
             // Ndef encoded intents provide messages directly
@@ -99,10 +102,10 @@ class NfcCheckInHandler
                     habitId = habitId,
                     completedDate = LocalDate.now(),
                     nfcUid = nfcUid,
-                    userId = Firebase.auth.currentUser?.uid.orEmpty(),
+                    userId = userId,
                 )
             Log.d("intent", "check-in: $checkIn")
-            habitDao.addCheckIn(checkIn)
+            repository.addCheckIn(checkIn)
         }
 
         suspend fun handleReader(tag: Tag) {
@@ -114,13 +117,13 @@ class NfcCheckInHandler
                     .payload
                     .toString(Charsets.UTF_8)
             Log.d("NfcCheckInHandler", "handling readerMode for habitId")
-            habitDao.addCheckIn(
+            repository.addCheckIn(
                 CheckIn(
                     id = Uuid.random().toString(),
                     habitId = habitId,
                     completedDate = LocalDate.now(),
                     nfcUid = tag.id,
-                    userId = Firebase.auth.currentUser?.uid.orEmpty(),
+                    userId = userId,
                 ),
             )
         }
