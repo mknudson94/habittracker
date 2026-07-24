@@ -5,6 +5,9 @@ import android.util.Log
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.auth
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,6 +18,8 @@ import com.mk.habittracker.data.dao.UserDao
 import com.mk.habittracker.data.database.AppDatabase
 import com.mk.habittracker.data.util.Converters
 import com.mk.habittracker.nfc.NfcModule
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import java.io.IOException
 import javax.inject.Singleton
 
@@ -37,14 +42,15 @@ class AppModule {
                 klass = AppDatabase::class.java,
                 name = "app_db",
             ).addTypeConverter(converters)
-            .addCallback(
-                object : RoomDatabase.Callback() {
-                    override fun onCreate(db: SupportSQLiteDatabase) {
-                        super.onCreate(db)
-                        seedDatabase(context, db)
-                    }
-                },
-            ).build()
+//            .addCallback(
+//                object : RoomDatabase.Callback() {
+//                    override fun onCreate(db: SupportSQLiteDatabase) {
+//                        super.onCreate(db)
+//                        seedDatabase(context, db)
+//                    }
+//                },
+//            )
+            .build()
 
     @Provides
     @Singleton

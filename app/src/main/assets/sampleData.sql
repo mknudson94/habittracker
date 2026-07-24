@@ -6,14 +6,15 @@
 -- USER
 -- ============================================================
 INSERT INTO "user" (id, email, created_at, user_timezone) VALUES
-('1', 'test.user@example.com', 1767225600000, 'America/New_York'); -- created 2026-01-01
+('1', 'test.user@example.com', 1767225600000, 'America/New_York'), -- created 2026-01-01
+('XaVBzZZ4QhO0zRIPsxCDVIDdYUt1', 'mknudson+test0gmail.com', 1767225600000, 'America/New_York')
 
 -- ============================================================
 -- HABITS
 -- ============================================================
 INSERT INTO habit (id, user_id, name, created_at) VALUES
-('1', '1', 'Drink 8 Glasses of Water', 1780272000000), -- created 2026-06-01
-('2', '1', 'Read 30 Minutes',          1780272000000), -- created 2026-06-01
+('d0172ae7-d115-45ea-a2de-5eb453dfa4b1', 'XaVBzZZ4QhO0zRIPsxCDVIDdYUt1', 'Drink 8 Glasses of Water', 1780272000000), -- created 2026-06-01
+('fed68a1c-1b2a-43f0-964b-cb78714a8293', 'XaVBzZZ4QhO0zRIPsxCDVIDdYUt1', 'Read 30 Minutes',          1780272000000), -- created 2026-06-01
 ('3', '1', 'Meditate',                 1781481600000); -- created 2026-06-15
 
 -- ============================================================
@@ -21,8 +22,8 @@ INSERT INTO habit (id, user_id, name, created_at) VALUES
 -- ============================================================
 
 -- Habit 1: Drink 8 Glasses of Water
-INSERT INTO check_in (id, habit_id, completed_date) VALUES
-('1', '1', '2026-07-06'),
+INSERT INTO check_in (id, habit_id, user_id, completed_date) VALUES
+('93193bd4-2e7e-48af-9d9a-8c5c5bc7f7c5', 'd0172ae7-d115-45ea-a2de-5eb453dfa4b1', 'XaVBzZZ4QhO0zRIPsxCDVIDdYUt1', '2026-07-06'),
 ('2', '1', '2026-07-07'),
 ('3', '1', '2026-07-09'),
 ('4', '1', '2026-07-10');

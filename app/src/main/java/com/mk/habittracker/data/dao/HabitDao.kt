@@ -12,6 +12,9 @@ interface HabitDao {
     @Insert
     suspend fun addHabit(habit: Habit)
 
+    @Insert
+    suspend fun addHabits(habits: List<Habit>)
+
     @Query("SELECT * FROM habit WHERE :userId = habit.user_id")
     fun getHabits(userId: String): Flow<List<Habit>>
 
@@ -34,6 +37,9 @@ interface HabitDao {
 
     @Insert
     suspend fun addCheckIn(checkIn: CheckIn)
+
+    @Insert
+    suspend fun addCheckIns(checkIns: List<CheckIn>)
 
     @Query(
         "DELETE FROM check_in " +

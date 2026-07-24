@@ -118,16 +118,19 @@ private fun HabitRowPreview() {
                 CheckIn(
                     id = "1",
                     habitId = "1",
+                    userId = "1",
                     completedDate = LocalDate.now().minusDays(1),
                 ),
                 CheckIn(
                     id = "1",
                     habitId = "1",
+                    userId = "1",
                     completedDate = LocalDate.now().minusDays(3),
                 ),
                 CheckIn(
                     id = "1",
                     habitId = "1",
+                    userId = "1",
                     completedDate = LocalDate.now().minusDays(4),
                 ),
             ),

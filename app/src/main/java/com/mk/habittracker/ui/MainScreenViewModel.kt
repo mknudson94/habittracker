@@ -2,6 +2,8 @@ package com.mk.habittracker.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -59,6 +61,7 @@ class MainScreenViewModel
                             id = Uuid.random().toString(),
                             habitId = habitId,
                             completedDate = LocalDate.now(),
+                            userId = Firebase.auth.currentUser?.uid.orEmpty(),
                         ),
                     )
                 } else {

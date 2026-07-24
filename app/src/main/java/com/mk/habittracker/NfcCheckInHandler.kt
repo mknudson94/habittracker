@@ -10,6 +10,8 @@ import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
@@ -54,7 +56,13 @@ class NfcCheckInHandler
                     "intent",
                     "launching async handler from messages: ${messages.contentToString()}",
                 )
-                messages?.let { handleIntent(it) }
+                messages?.let {
+                    val tagId = intent.getByteArrayExtra(NfcAdapter.EXTRA_ID)
+                    handleIntent(
+                        nfcUid = tagId ?: byteArrayOf(),
+                        messages = it,
+                    )
+                }
             } else {
                 val tag = intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG)
                 Log.d("intent", "tag: $tag")
@@ -65,7 +73,10 @@ class NfcCheckInHandler
             }
         }
 
-        suspend fun handleIntent(messages: Array<NdefMessage>) {
+        suspend fun handleIntent(
+            nfcUid: ByteArray,
+            messages: Array<NdefMessage>
+        ) {
             // todo: robust checking
 
             Log.d("intent", "handling nfc intent with messages:")
@@ -87,6 +98,8 @@ class NfcCheckInHandler
                     id = Uuid.random().toString(),
                     habitId = habitId,
                     completedDate = LocalDate.now(),
+                    nfcUid = nfcUid,
+                    userId = Firebase.auth.currentUser?.uid.orEmpty(),
                 )
             Log.d("intent", "check-in: $checkIn")
             habitDao.addCheckIn(checkIn)
@@ -106,6 +119,8 @@ class NfcCheckInHandler
                     id = Uuid.random().toString(),
                     habitId = habitId,
                     completedDate = LocalDate.now(),
+                    nfcUid = tag.id,
+                    userId = Firebase.auth.currentUser?.uid.orEmpty(),
                 ),
             )
         }
