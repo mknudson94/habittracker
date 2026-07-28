@@ -24,3 +24,13 @@ dependencyResolutionManagement {
 
 rootProject.name = "HabitTracker"
 include(":app")
+include(":core:model")
+include(":core:common")
+include(":core:database")
+include(":core:data")
+include(":core:ui")
+include(":core:nfc")
+include(":feature:home")
+include(":feature:auth")
+include(":feature:add-habit")
+include(":feature:habit-detail")

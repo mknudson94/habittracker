@@ -1,7 +1,6 @@
 package com.mk.habittracker.ui
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -13,9 +12,13 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.navigation3.ui.NavDisplay
-import com.mk.habittracker.ui.login.LoginScreen
-import com.mk.habittracker.ui.login.LoginViewModel
-import com.mk.habittracker.ui.login.SignupScreen
+import com.mk.habittracker.feature.home.MainScreen
+import com.mk.habittracker.feature.auth.LoginScreen
+import com.mk.habittracker.feature.auth.SignupScreen
+import com.mk.habittracker.feature.auth.LoginViewModel
+import com.mk.habittracker.feature.addhabit.AddHabitScreen
+import com.mk.habittracker.feature.habitdetail.HabitDetailScreen
+import com.mk.habittracker.feature.habitdetail.HabitDetailViewModel
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -42,7 +45,6 @@ fun AppNavigation(
 ) {
     val user by viewModel.authState.collectAsStateWithLifecycle()
 
-    // this is all that's needed to drive transitions between login and home
     val backStack = if (user == null) {
         rememberNavBackStack(LoginRoute)
     } else {
@@ -66,7 +68,6 @@ fun AppNavigation(
                         onLogout = viewModel::signOut,
                     )
                 }
-                // TODO: container animation
                 entry<AddHabitRoute>(
                     metadata =
                         DialogSceneStrategy.dialog(
@@ -78,8 +79,6 @@ fun AppNavigation(
                     )
                 }
                 entry<HabitDetailRoute> { key ->
-                    // use assistedDI with vm scoped to entry (not activity) by
-                    // rememberViewModelStoreNavEntryDecorator decorator
                     HabitDetailScreen(
                         vm =
                             hiltViewModel<HabitDetailViewModel, HabitDetailViewModel.Factory>(

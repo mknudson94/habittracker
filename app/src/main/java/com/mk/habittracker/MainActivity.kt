@@ -14,11 +14,12 @@ import androidx.lifecycle.lifecycleScope
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import com.mk.habittracker.core.nfc.NfcCheckInHandler
+import com.mk.habittracker.core.nfc.NfcReaderModeController
+import com.mk.habittracker.core.ui.theme.HabitTrackerTheme
+import com.mk.habittracker.ui.AppNavigation
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import com.mk.habittracker.nfc.NfcReaderModeController
-import com.mk.habittracker.ui.AppNavigation
-import com.mk.habittracker.ui.theme.HabitTrackerTheme
 import javax.inject.Inject
 
 @AndroidEntryPoint

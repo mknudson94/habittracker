@@ -42,6 +42,16 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:model"))
+    implementation(project(":core:database"))
+    implementation(project(":core:data"))
+    implementation(project(":core:ui"))
+    implementation(project(":core:nfc"))
+    implementation(project(":feature:home"))
+    implementation(project(":feature:auth"))
+    implementation(project(":feature:add-habit"))
+    implementation(project(":feature:habit-detail"))
+
     compileOnly(libs.errorprone.annotations)
 
     ksp(libs.androidx.room.compiler)
