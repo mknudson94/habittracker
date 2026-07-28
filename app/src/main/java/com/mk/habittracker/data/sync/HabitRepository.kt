@@ -36,7 +36,7 @@ class HabitRepository @Inject constructor(
                     .get()
                     .await()
                 
-                val habits = result.documents.map { Habit.from(it.data) }
+                val habits = result.documents.map { Habit.from(id = it.id, data = it.data) }
                 // // TODO: handle conflicts by comparing timestamps (e.g., updated_at)
                 habitDao.addHabits(habits)
             } catch (e: Exception) {
@@ -77,7 +77,7 @@ class HabitRepository @Inject constructor(
                     .get()
                     .await()
                 
-                val checkIns = result.documents.map { CheckIn.from(it.data) }
+                val checkIns = result.documents.map { CheckIn.from(id = it.id, data = it.data) }
                 // // TODO: handle conflicts by comparing timestamps (e.g., updated_at)
                 habitDao.addCheckIns(checkIns)
             } catch (e: Exception) {

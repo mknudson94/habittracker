@@ -49,10 +49,10 @@ data class CheckIn(
     }
 
     companion object {
-        fun from(data: Map<String, Any>?): CheckIn {
+        fun from(id: String, data: Map<String, Any>?): CheckIn {
             data!!
             return CheckIn(
-                id = data["id"] as? String ?: error("couldn't read id"),
+                id = id,
                 habitId = data["habit_id"] as? String ?: error("couldn't read habit_id"),
                 userId = data["user_id"] as? String ?: error("couldn't read user_id"),
                 completedDate = LocalDate.parse(data["completed_date"] as? String ?: error("couldn't read completed_date")),

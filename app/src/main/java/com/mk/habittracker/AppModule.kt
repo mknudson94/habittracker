@@ -41,7 +41,9 @@ class AppModule {
                 context = context,
                 klass = AppDatabase::class.java,
                 name = "app_db",
-            ).addTypeConverter(converters)
+            )
+            .addTypeConverter(converters)
+            .fallbackToDestructiveMigration(true)
 //            .addCallback(
 //                object : RoomDatabase.Callback() {
 //                    override fun onCreate(db: SupportSQLiteDatabase) {
