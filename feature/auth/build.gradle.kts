@@ -24,8 +24,10 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:ui"))
-    
+    debugImplementation(libs.androidx.compose.ui.tooling)
+
+    ksp(libs.hilt.android.compiler)
+
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.ui)
@@ -33,8 +35,9 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.hilt.android)
-    ksp(libs.hilt.android.compiler)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(platform(libs.firebase.bom))
+    implementation(project(":core:ui"))
 }

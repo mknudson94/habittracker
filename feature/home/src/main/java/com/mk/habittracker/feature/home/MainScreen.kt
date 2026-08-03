@@ -4,11 +4,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MediumFlexibleTopAppBar
+import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,11 +16,12 @@ import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.mk.habittracker.core.model.Habit
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import com.mk.habittracker.core.model.Habit
 
 @Composable
 fun MainScreen(
@@ -36,24 +36,29 @@ fun MainScreen(
         habits = habits,
         modifier = modifier,
         onAddHabit = onAddHabit,
-        onHabitClick = onHabitClick,
         onLogout = onLogout,
+        habitRow = { habit ->
+            HabitRow(
+                habit = habit,
+                onClick = { onHabitClick(habit.id) },
+            )
+        }
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     habits: ImmutableList<Habit>,
     modifier: Modifier = Modifier,
     onAddHabit: () -> Unit = {},
-    onHabitClick: (habitId: String) -> Unit = {},
     onLogout: () -> Unit = {},
+    habitRow: @Composable (Habit) -> Unit,
 ) {
     Scaffold(
         modifier = modifier,
         topBar = {
-            MediumFlexibleTopAppBar(
+            MediumTopAppBar(
                 title = {
                     Text("Habits")
                 },
@@ -82,11 +87,12 @@ fun MainScreen(
             modifier =
                 Modifier
                     .padding(paddingValues)
+                    .padding(horizontal = 16.dp)
                     .fillMaxSize(),
         ) {
             habits.forEach { habit ->
                 key(habit.id) {
-                    HabitRow(habit = habit, onClick = { onHabitClick(habit.id) })
+                    habitRow(habit)
                 }
             }
         }
@@ -97,6 +103,28 @@ fun MainScreen(
 @Composable
 private fun MainScreenPreview() {
     MainScreen(
-        habits = persistentListOf(),
+        habits = persistentListOf(
+            Habit(
+                id = "1",
+                userId = "1",
+                name = "Drink water",
+                createdAt = 0L,
+            ),
+            Habit(
+                id = "2",
+                userId = "1",
+                name = "Exercise",
+                createdAt = 0L,
+            )
+        ),
+        habitRow = { habit ->
+            // Use a simple Text for preview to avoid ViewModel issues in nested components
+            HabitRow(
+                habit = habit,
+                checkIns = persistentListOf(),
+                onClick = {},
+                onToggleCheckIn = { _, _ -> },
+            )
+        }
     )
 }

@@ -1,4 +1,4 @@
-package com.mk.habittracker.feature.habitdetail
+package com.mk.habittracker.feature.pairnfc
 
 import android.nfc.NdefMessage
 import android.nfc.NdefRecord
@@ -17,6 +17,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 
 sealed class PairNfcTagState {
@@ -52,6 +53,7 @@ class NfcPairingViewModel @AssistedInject constructor(
 
     private fun startWriteNfcTagJob() {
         if (writeNfcTagJob?.isActive == true) return
+        nfcReaderModeFlag.requestReaderMode()
         writeNfcTagJob =
             tagBus.tags
                 .onEach { tag ->
@@ -69,11 +71,15 @@ class NfcPairingViewModel @AssistedInject constructor(
                             WriteNfcResult.DidNotOverwrite -> PairNfcTagState.ConfirmOverwrite()
                             is WriteNfcResult.Error -> PairNfcTagState.Error(result.message)
                         }
-                }.launchIn(viewModelScope)
+                }
+                .onCompletion {
+                    Log.d("nfc", "[NfcPairingViewModel#tags.onCompletion] cleaning up; cause = $it")
+                    nfcReaderModeFlag.releaseReaderMode()
+                }
+                .launchIn(viewModelScope)
     }
 
     init {
-        nfcReaderModeFlag.requestReaderMode()
         Log.d("nfc", "[NfcPairingViewModel#init]")
         _pairingState
             .onEach {
@@ -112,6 +118,10 @@ class NfcPairingViewModel @AssistedInject constructor(
         require(_pairingState.value is PairNfcTagState.ConfirmOverwrite)
         _pairingState.value =
             (_pairingState.value as PairNfcTagState.ConfirmOverwrite).copy(confirmed = true)
+    }
+
+    fun tryAgain() {
+        _pairingState.value = PairNfcTagState.ReadyToScan
     }
 
     private fun buildMessage(): NdefMessage =

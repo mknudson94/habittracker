@@ -12,13 +12,13 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.navigation3.ui.NavDisplay
-import com.mk.habittracker.feature.home.MainScreen
-import com.mk.habittracker.feature.auth.LoginScreen
-import com.mk.habittracker.feature.auth.SignupScreen
-import com.mk.habittracker.feature.auth.LoginViewModel
 import com.mk.habittracker.feature.addhabit.AddHabitScreen
+import com.mk.habittracker.feature.auth.LoginScreen
+import com.mk.habittracker.feature.auth.LoginViewModel
+import com.mk.habittracker.feature.auth.SignupScreen
 import com.mk.habittracker.feature.habitdetail.HabitDetailScreen
 import com.mk.habittracker.feature.habitdetail.HabitDetailViewModel
+import com.mk.habittracker.feature.home.MainScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -71,7 +71,10 @@ fun AppNavigation(
                 entry<AddHabitRoute>(
                     metadata =
                         DialogSceneStrategy.dialog(
-                            DialogProperties(usePlatformDefaultWidth = false),
+                            DialogProperties(
+                                usePlatformDefaultWidth = false,
+                                decorFitsSystemWindows = false,
+                            ),
                         ),
                 ) {
                     AddHabitScreen(

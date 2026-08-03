@@ -4,6 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.mk.habittracker.core.data.HabitRepository
+import com.mk.habittracker.core.database.HabitDao
+import com.mk.habittracker.core.database.asExternalModel
+import com.mk.habittracker.core.model.Habit
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -12,10 +16,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import com.mk.habittracker.core.database.HabitDao
-import com.mk.habittracker.core.database.asExternalModel
-import com.mk.habittracker.core.model.Habit
-import com.mk.habittracker.core.data.HabitRepository
 
 @HiltViewModel(assistedFactory = HabitDetailViewModel.Factory::class)
 class HabitDetailViewModel
@@ -44,6 +44,11 @@ class HabitDetailViewModel
                     initialValue = null,
                 )
 
+    val checkIns = repository.getCheckIns(habitId, userId).stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList(),
+    )
         val nCheckIns =
             repository.getCheckIns(habitId, userId).map { it.size.toString() }.stateIn(
                 scope = viewModelScope,

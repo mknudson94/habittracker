@@ -24,12 +24,17 @@ android {
 }
 
 dependencies {
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.ui.tooling)
+
+    ksp(libs.hilt.android.compiler)
+
     implementation(project(":core:model"))
     implementation(project(":core:common"))
     implementation(project(":core:data"))
     implementation(project(":core:ui"))
     implementation(project(":core:nfc"))
-    
+
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.ui)
@@ -42,5 +47,4 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.hilt.android)
-    ksp(libs.hilt.android.compiler)
 }

@@ -24,11 +24,14 @@ android {
 }
 
 dependencies {
+    debugImplementation(libs.androidx.compose.ui.tooling)
+
     implementation(project(":core:model"))
     implementation(project(":core:data"))
     implementation(project(":core:ui"))
-    implementation(project(":feature:habit-detail"))
-    
+    implementation(project(":feature:pair-nfc"))
+
+    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.ui)

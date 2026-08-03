@@ -11,9 +11,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.collection.intListOf
 import androidx.lifecycle.lifecycleScope
-import com.google.firebase.Firebase
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
+import com.jakewharton.threetenabp.AndroidThreeTen
 import com.mk.habittracker.core.nfc.NfcCheckInHandler
 import com.mk.habittracker.core.nfc.NfcReaderModeController
 import com.mk.habittracker.core.ui.theme.HabitTrackerTheme
@@ -28,8 +26,6 @@ class MainActivity : ComponentActivity() {
 
     @Inject lateinit var nfcCheckInHandler: NfcCheckInHandler
 
-    private lateinit var auth: FirebaseAuth
-
     override fun onNewIntent(intent: Intent) {
         Log.d("intent", "handling intent: ${intent.asString()}")
         super.onNewIntent(intent)
@@ -41,9 +37,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        auth = Firebase.auth
-
+        AndroidThreeTen.init(this)
         lifecycleScope.launch {
             nfcCheckInHandler.handleIntent(this@MainActivity.intent)
         }
@@ -59,12 +53,6 @@ class MainActivity : ComponentActivity() {
                 AppNavigation()
             }
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-        val currentUser = auth.currentUser
     }
 }
 

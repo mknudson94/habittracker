@@ -42,6 +42,7 @@ android {
 }
 
 dependencies {
+
     implementation(project(":core:model"))
     implementation(project(":core:database"))
     implementation(project(":core:data"))
@@ -51,6 +52,8 @@ dependencies {
     implementation(project(":feature:auth"))
     implementation(project(":feature:add-habit"))
     implementation(project(":feature:habit-detail"))
+    implementation(project(":feature:pair-nfc"))
+
 
     compileOnly(libs.errorprone.annotations)
 
@@ -76,6 +79,7 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.kotlinx.serialization.core)
+    implementation(libs.threetenabp)
     implementation(platform(libs.androidx.compose.bom))
     implementation(platform(libs.firebase.bom))
 

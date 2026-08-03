@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.mk.habittracker.feature.habitdetail"
+    namespace = "com.mk.habittracker.feature.pairnfc"
     compileSdk = 37
 
     defaultConfig {
@@ -24,17 +24,14 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.compose.runtime)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     implementation(project(":core:model"))
     implementation(project(":core:database"))
     implementation(project(":core:data"))
     implementation(project(":core:ui"))
-    implementation(project(":feature:pair-nfc"))
+    implementation(project(":core:nfc"))
 
-    implementation(libs.threetenabp)
-    implementation(libs.kotlinx.collections.immutable)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)

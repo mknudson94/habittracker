@@ -112,16 +112,15 @@ class NfcCheckInHandler @Inject constructor(
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
         Log.d("NfcCheckInHandler", "starting checkInJob")
-        checkInJob =
-            tagBus.tags
-                .onEach { tag ->
-                    Log.d(
-                        "NfcCheckInHandler",
-                        "received tag: $tag\n\treaderMode is currently ${nfcReaderModeFlag.readerModeRequested.value}",
-                    )
-                    // only check in if nobody else is scanning for tag events
-                    if (!nfcReaderModeFlag.readerModeRequested.value) handleReader(tag)
-                }.launchIn(owner.lifecycleScope)
+        checkInJob = tagBus.tags
+            .onEach { tag ->
+                Log.d(
+                    "NfcCheckInHandler",
+                    "received tag: $tag\n\treaderMode is currently ${nfcReaderModeFlag.readerModeRequested.value}",
+                )
+                // only check in if nobody else is scanning for tag events
+                if (!nfcReaderModeFlag.readerModeRequested.value) handleReader(tag)
+            }.launchIn(owner.lifecycleScope)
     }
 
     override fun onStop(owner: LifecycleOwner) {
