@@ -47,6 +47,8 @@ class MainActivity : ComponentActivity() {
         lifecycle.addObserver(nfcReaderModeController)
         lifecycle.addObserver(nfcCheckInHandler)
 
+
+
         enableEdgeToEdge()
         setContent {
             HabitTrackerTheme {
