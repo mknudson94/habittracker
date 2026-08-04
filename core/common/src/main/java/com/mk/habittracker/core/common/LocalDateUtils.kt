@@ -10,7 +10,7 @@ data object LocalDateUtils {
         val labels = arrayOfNulls<String>(DAYS_IN_WEEK)
         repeat(DAYS_IN_WEEK) { i ->
             val day = today.minusDays(DAYS_IN_WEEK - (i + 1L))
-            labels[i] = day.dayOfWeek.getDisplayName(TextStyle.SHORT_STANDALONE, locale)
+            labels[i] = day.dayOfWeek.getDisplayName(TextStyle.NARROW_STANDALONE, locale)
         }
         return labels as Array<String>
     }
