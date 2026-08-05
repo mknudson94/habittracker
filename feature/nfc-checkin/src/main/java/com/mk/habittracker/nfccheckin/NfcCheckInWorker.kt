@@ -15,7 +15,7 @@ import androidx.work.WorkerParameters
 import com.mk.habittracker.core.nfc.HabitTrackerNdef
 import com.mk.habittracker.core.nfc.NfcCheckInHandler
 import dagger.assisted.Assisted
-import javax.inject.Inject
+import dagger.assisted.AssistedInject
 import kotlin.random.Random
 
 internal const val NFC_UID_KEY = "nfc_uid"
@@ -23,7 +23,7 @@ internal const val NFC_HABIT_ID_KEY = "nfc_habit_id"
 const val CHANNEL_ID = "nfc_checkin_notification_channel"
 
 @HiltWorker
-class NfcCheckInWorker @Inject constructor(
+class NfcCheckInWorker @AssistedInject constructor(
     @Assisted val appContext: Context,
     @Assisted workerParams: WorkerParameters,
     private val nfcCheckInHandler: NfcCheckInHandler,
