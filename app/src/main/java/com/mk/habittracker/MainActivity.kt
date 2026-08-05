@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.mk.habittracker.core.nfc.NfcCheckInHandler
 import com.mk.habittracker.core.nfc.NfcReaderModeController
+import com.mk.habittracker.core.nfc.parseHabitTrackerNdef
 import com.mk.habittracker.core.ui.theme.HabitTrackerTheme
 import com.mk.habittracker.ui.AppNavigation
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,16 +32,13 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         lifecycleScope.launch {
-            nfcCheckInHandler.handleIntent(intent)
+            intent.parseHabitTrackerNdef()?.let { nfcCheckInHandler.checkIn(it) }
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AndroidThreeTen.init(this)
-        lifecycleScope.launch {
-            nfcCheckInHandler.handleIntent(this@MainActivity.intent)
-        }
 
         Log.d("onCreate", intent.asString())
 

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.NFC" />
 
@@ -25,14 +24,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!-- Enable deep links -->
             <intent-filter>
-                <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <!-- android maps external types to this: vnd.android.nfc://ext/<domain_name>:<service_name>                    -->
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
-                    android:scheme="vnd.android.nfc"
-                    android:host="ext"
-                    android:pathPrefix="/com.mk.habittracker:habit_tag"/>
+                    android:scheme="com.mk.habittracker"
+                    android:host="habit" />
             </intent-filter>
         </activity>
     </application>

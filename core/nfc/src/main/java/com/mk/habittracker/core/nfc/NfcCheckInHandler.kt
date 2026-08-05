@@ -3,8 +3,6 @@ package com.mk.habittracker.core.nfc
 import android.content.Intent
 import android.nfc.NdefMessage
 import android.nfc.NfcAdapter
-import android.nfc.Tag
-import android.nfc.tech.Ndef
 import android.os.Build
 import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -89,21 +87,13 @@ class NfcCheckInHandler @Inject constructor(
         repository.addCheckIn(checkIn)
     }
 
-    suspend fun handleReader(tag: Tag) {
-        val ndef = Ndef.get(tag) ?: error("null ndef")
-        val message = ndef.cachedNdefMessage ?: ndef.ndefMessage ?: error("null message")
-        val habitId =
-            message.records
-                .first()
-                .payload
-                .toString(Charsets.UTF_8)
-        Log.d("NfcCheckInHandler", "handling readerMode for habitId")
+    suspend fun checkIn(ndef: HabitTrackerNdef) {
         repository.addCheckIn(
             CheckIn(
                 id = Uuid.random().toString(),
-                habitId = habitId,
+                habitId = ndef.habitId,
                 completedDate = LocalDate.now(),
-                nfcUid = tag.id,
+                nfcUid = ndef.uid,
                 userId = userId,
             ),
         )
@@ -118,8 +108,10 @@ class NfcCheckInHandler @Inject constructor(
                     "NfcCheckInHandler",
                     "received tag: $tag\n\treaderMode is currently ${nfcReaderModeFlag.readerModeRequested.value}",
                 )
-                // only check in if nobody else is scanning for tag events
-                if (!nfcReaderModeFlag.readerModeRequested.value) handleReader(tag)
+                // only check in if nobody else (e.g. write flow) is scanning for tag events
+                if (!nfcReaderModeFlag.readerModeRequested.value) {
+                    checkIn(tag.parseHabitTrackerNdef())
+                }
             }.launchIn(owner.lifecycleScope)
     }
 

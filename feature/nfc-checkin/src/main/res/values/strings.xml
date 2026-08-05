@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="channel_name">Check-in confirmations</string>
+    <string name="channel_description">Confirms when a habit is checked in</string>
+    <string name="check_in_notification_title">Check-in Successful</string>
+    <string name="check_in_notification_content">You\'ve checked in for your habit.</string>
+    <string name="undo">Undo</string>
+    <string name="trampoline_label">Habit_Tracker_Trampoline</string>
+    <string name="action_undo_checkin" translatable="false">com.mk.habittracker.ACTION_UNDO_CHECKIN</string>
+    <string name="deep_link_base" translatable="false">com.mk.habittracker://habit/</string>
+    <string name="anonymous" translatable="false">anonymous</string>
+    <string name="extra_habit_id" translatable="false">extra_habit_id</string>
+    <string name="extra_notification_id" translatable="false">extra_notification_id</string>
+    <string name="nfc_uid_key" translatable="false">nfc_uid</string>
+    <string name="nfc_habit_id_key" translatable="false">nfc_habit_id</string>
+    <string name="nfc_checkin_channel_id" translatable="false">nfc_checkin_notification_channel</string>
+</resources>

@@ -1,5 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -9,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        minSdk = 30
+        minSdk = 28
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -21,13 +23,22 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.hilt.common)
+    ksp(libs.hilt.android.compiler)
+
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.hilt.android)
     implementation(libs.material)
+    implementation(project(":core:nfc"))
+    implementation(project(":core:data"))
+    implementation(libs.firebase.auth)
+    implementation(platform(libs.firebase.bom))
+
     testImplementation(libs.junit)
 
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(libs.androidx.work.testing)
     androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.work.testing)
 }

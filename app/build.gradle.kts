@@ -53,6 +53,7 @@ dependencies {
     implementation(project(":feature:add-habit"))
     implementation(project(":feature:habit-detail"))
     implementation(project(":feature:pair-nfc"))
+    implementation(project(":feature:nfc-checkin"))
 
 
     compileOnly(libs.errorprone.annotations)
