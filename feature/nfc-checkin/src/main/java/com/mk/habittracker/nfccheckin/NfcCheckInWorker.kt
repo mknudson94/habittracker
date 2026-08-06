@@ -13,10 +13,14 @@ import androidx.core.net.toUri
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import com.mk.habittracker.core.data.HabitRepository
 import com.mk.habittracker.core.nfc.HabitTrackerNdef
 import com.mk.habittracker.core.nfc.NfcCheckInHandler
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.first
 import kotlin.random.Random
 
 internal const val NFC_UID_KEY = "nfc_uid"
@@ -29,7 +33,11 @@ class NfcCheckInWorker @AssistedInject constructor(
     @Assisted val appContext: Context,
     @Assisted workerParams: WorkerParameters,
     private val nfcCheckInHandler: NfcCheckInHandler,
+    private val habitRepository: HabitRepository,
 ) : CoroutineWorker(appContext, workerParams) {
+
+    val auth = Firebase.auth
+
     override suspend fun doWork(): Result {
         val tagId = this.inputData.getByteArray(NFC_UID_KEY)
         val habitId = this.inputData.getString(NFC_HABIT_ID_KEY) ?: error("null habit id")
@@ -46,10 +54,15 @@ class NfcCheckInWorker @AssistedInject constructor(
         return Result.success()
     }
 
-    private fun sendNotification(habitId: String) {
+    private suspend fun sendNotification(habitId: String) {
         Log.d("worker", "sending notification")
+
+        val habit = auth.currentUser?.let {
+            habitRepository.getHabit(it.uid, habitId).first()
+        }!!
+
         val textTitle = appContext.getString(R.string.check_in_notification_title)
-        val textContent = appContext.getString(R.string.check_in_notification_content)
+        val textContent = habit.name
         val notificationId = Random.nextInt()
         val contentIntent = buildCheckInPendingIntent(notificationId, habitId)
         val undoIntent = buildUndoPendingIntent(notificationId, habitId)

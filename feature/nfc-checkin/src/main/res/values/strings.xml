@@ -2,8 +2,9 @@
 <resources>
     <string name="channel_name">Check-in confirmations</string>
     <string name="channel_description">Confirms when a habit is checked in</string>
-    <string name="check_in_notification_title">Check-in Successful</string>
-    <string name="check_in_notification_content">You\'ve checked in for your habit.</string>
+    <string name="check_in_notification_title">✓&#160;Checked in</string>
+    <string name="check_in_notification_content">You\'ve checked in for %1$s.</string>
+    <string name="check_in_notification_content_generic">You\'ve checked in for your habit.</string>
     <string name="undo">Undo</string>
     <string name="trampoline_label">Habit_Tracker_Trampoline</string>
     <string name="action_undo_checkin" translatable="false">com.mk.habittracker.ACTION_UNDO_CHECKIN</string>
