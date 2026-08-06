@@ -33,6 +33,7 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.hilt.android)
     implementation(libs.material)
+    implementation(project(":core:ui"))
     implementation(project(":core:nfc"))
     implementation(project(":core:data"))
     implementation(project(":core:model"))

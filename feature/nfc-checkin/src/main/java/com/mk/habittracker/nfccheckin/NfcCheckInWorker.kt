@@ -22,11 +22,12 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
 import kotlin.random.Random
+import com.mk.habittracker.core.ui.R as CoreR
 
 internal const val NFC_UID_KEY = "nfc_uid"
 internal const val NFC_HABIT_ID_KEY = "nfc_habit_id"
 const val CHANNEL_ID = "nfc_checkin_notification_channel"
-private const val NOTIFICATION_TIMEOUT = 8_000L
+private const val NOTIFICATION_TIMEOUT = 12_000L
 
 @HiltWorker
 class NfcCheckInWorker @AssistedInject constructor(
@@ -70,11 +71,12 @@ class NfcCheckInWorker @AssistedInject constructor(
         val builder = NotificationCompat.Builder(appContext, CHANNEL_ID)
             .setContentTitle(textTitle)
             .setContentText(textContent)
-            .setSmallIcon(R.drawable.undo)  // TODO: real icon
+            .setSmallIcon(CoreR.drawable.priority_16dp)
+//            .setColor(0xFF15803D.toInt())
             .setContentIntent(contentIntent)
             .addAction(R.drawable.undo, appContext.getString(R.string.undo), undoIntent)
             .setAutoCancel(true) // dismisses on-tap
-            .setTimeoutAfter(NOTIFICATION_TIMEOUT) // dismiss automatically after short delay
+//            .setTimeoutAfter(NOTIFICATION_TIMEOUT) // dismiss automatically after short delay
 
         with(NotificationManagerCompat.from(appContext)) {
             if (ActivityCompat.checkSelfPermission(
