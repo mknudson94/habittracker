@@ -15,7 +15,7 @@ data class CheckIn(
         "habit_id" to habitId,
         "user_id" to userId,
         "completed_date" to completedDate.toString(),
-        "nfc_tag_uid" to nfcUid,
+        "nfc_tag_uid" to nfcUid?.map { it.toInt() },
     )
 
     override fun equals(other: Any?): Boolean {
@@ -50,7 +50,9 @@ data class CheckIn(
                 habitId = data["habit_id"] as? String ?: error("couldn't read habit_id"),
                 userId = data["user_id"] as? String ?: error("couldn't read user_id"),
                 completedDate = LocalDate.parse(data["completed_date"] as? String ?: error("couldn't read completed_date")),
-                nfcUid = data["nfc_tag_uid"] as? ByteArray,
+                nfcUid = (data["nfc_tag_uid"] as? List<*>)
+                    ?.map { (it as Number).toByte() }
+                    ?.toByteArray(),
             )
         }
     }

@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -21,6 +22,7 @@ import kotlin.random.Random
 internal const val NFC_UID_KEY = "nfc_uid"
 internal const val NFC_HABIT_ID_KEY = "nfc_habit_id"
 const val CHANNEL_ID = "nfc_checkin_notification_channel"
+private const val NOTIFICATION_TIMEOUT = 8_000L
 
 @HiltWorker
 class NfcCheckInWorker @AssistedInject constructor(
@@ -45,6 +47,7 @@ class NfcCheckInWorker @AssistedInject constructor(
     }
 
     private fun sendNotification(habitId: String) {
+        Log.d("worker", "sending notification")
         val textTitle = appContext.getString(R.string.check_in_notification_title)
         val textContent = appContext.getString(R.string.check_in_notification_content)
         val notificationId = Random.nextInt()
@@ -54,10 +57,11 @@ class NfcCheckInWorker @AssistedInject constructor(
         val builder = NotificationCompat.Builder(appContext, CHANNEL_ID)
             .setContentTitle(textTitle)
             .setContentText(textContent)
+            .setSmallIcon(R.drawable.undo)  // TODO: real icon
             .setContentIntent(contentIntent)
             .addAction(R.drawable.undo, appContext.getString(R.string.undo), undoIntent)
             .setAutoCancel(true) // dismisses on-tap
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setTimeoutAfter(NOTIFICATION_TIMEOUT) // dismiss automatically after short delay
 
         with(NotificationManagerCompat.from(appContext)) {
             if (ActivityCompat.checkSelfPermission(
@@ -67,9 +71,11 @@ class NfcCheckInWorker @AssistedInject constructor(
             ) {
                 // TODO: Consider calling ActivityCompat#requestPermissions here
                 // https://developer.android.com/develop/ui/compose/notifications/create-notification#notify
+                Log.w("worker", "POST_NOTIFICATIONS permission not granted")
                 return@with
             }
             // Save id somewhere if I ever want to update/delete notifications programatically
+            Log.d("worker", "actually calling notify for $notificationId")
             notify(notificationId, builder.build())
         }
     }

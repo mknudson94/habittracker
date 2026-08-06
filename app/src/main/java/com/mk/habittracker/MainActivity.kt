@@ -1,14 +1,17 @@
 package com.mk.habittracker
 
+import android.Manifest
 import android.content.Intent
 import android.nfc.NdefMessage
 import android.nfc.NdefRecord
 import android.nfc.Tag
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.collection.intListOf
 import androidx.lifecycle.lifecycleScope
 import com.jakewharton.threetenabp.AndroidThreeTen
@@ -26,6 +29,16 @@ class MainActivity : ComponentActivity() {
     @Inject lateinit var nfcReaderModeController: NfcReaderModeController
 
     @Inject lateinit var nfcCheckInHandler: NfcCheckInHandler
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            Log.d("MainActivity", "Notification permission granted")
+        } else {
+            Log.w("MainActivity", "Notification permission denied")
+        }
+    }
 
     override fun onNewIntent(intent: Intent) {
         Log.d("intent", "handling intent: ${intent.asString()}")
@@ -52,6 +65,11 @@ class MainActivity : ComponentActivity() {
             HabitTrackerTheme {
                 AppNavigation()
             }
+        }
+
+        // does order matter here?
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
 }
