@@ -33,6 +33,9 @@ class HabitRepository @Inject constructor(
         }
     }
 
+    fun getHabit(userId: String, habitId: String): Flow<Habit> =
+        habitDao.getHabit(userId, habitId).map { it.asExternalModel() }
+
     private fun pullHabits(userId: String) {
         scope.launch {
             try {

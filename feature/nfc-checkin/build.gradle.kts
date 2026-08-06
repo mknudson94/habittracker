@@ -35,6 +35,7 @@ dependencies {
     implementation(libs.material)
     implementation(project(":core:nfc"))
     implementation(project(":core:data"))
+    implementation(project(":core:model"))
     implementation(libs.firebase.auth)
     implementation(platform(libs.firebase.bom))
 
