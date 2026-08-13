@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,6 +32,7 @@ import com.mk.habittracker.core.ui.ButtonSize
 import com.mk.habittracker.core.ui.FullSheet
 import com.mk.habittracker.core.ui.HabitButton
 import com.mk.habittracker.feature.pairnfc.NfcPairingBottomSheet
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,12 +40,21 @@ fun AddHabitScreen(
     onDismiss: () -> Unit,
     vm: AddHabitViewModel = hiltViewModel(),
 ) {
+    val scope = rememberCoroutineScope()
+    var isSaving by remember { mutableStateOf(false) }
     AddHabitScreen(
         habitId = vm.habitId,
         nameTextFieldState = vm.name,
-        onSaveHabit = vm::saveHabit,
+        onSaveHabit = {
+            scope.launch {
+                isSaving = true
+                vm.saveHabit()
+                onDismiss()
+            }
+        },
         onDismiss = onDismiss,
         onTagPaired = vm::onTagPaired,
+        isSaving = isSaving,
     )
 }
 
@@ -56,6 +67,7 @@ fun AddHabitScreen(
     onDismiss: () -> Unit,
     onTagPaired: (ByteArray) -> Unit,
     modifier: Modifier = Modifier,
+    isSaving: Boolean = false,
 ) {
     val nfcBottomSheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -70,6 +82,7 @@ fun AddHabitScreen(
                 text = "Save habit",
                 onClick = onSaveHabit,
                 size = ButtonSize.Medium,
+                isLoading = isSaving,
             )
         },
     ) {

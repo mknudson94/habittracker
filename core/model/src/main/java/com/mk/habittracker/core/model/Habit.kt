@@ -5,7 +5,7 @@ data class Habit(
     val userId: String,
     val name: String,
     val createdAt: Long,
-    val tagId: ByteArray?,
+    val tagId: ByteArray? = null,
 ) {
     fun toMap(): Map<String, Any?> = mapOf(
         "id" to id,
