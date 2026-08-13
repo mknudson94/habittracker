@@ -9,7 +9,7 @@ import javax.inject.Inject
 class WriteNfcTagUseCase @Inject constructor() {
     fun execute(
         tag: Tag,
-        message: NdefMessage,
+        habitId: String,
         shouldOverwrite: Boolean,
     ): WriteNfcResult {
         val ndef = Ndef.get(tag)
@@ -22,8 +22,8 @@ class WriteNfcTagUseCase @Inject constructor() {
             if (!ndef.isBlank() && !shouldOverwrite) {
                 WriteNfcResult.DidNotOverwrite
             } else {
-                ndef.writeNdefMessage(message)
-                WriteNfcResult.Success
+                ndef.writeNdefMessage(buildMessage(habitId))
+                WriteNfcResult.Success(tag.id)
             }
         } catch (e: Exception) {
             WriteNfcResult.Error(e.localizedMessage.orEmpty())
@@ -34,7 +34,18 @@ class WriteNfcTagUseCase @Inject constructor() {
 }
 
 sealed class WriteNfcResult {
-    data object Success : WriteNfcResult()
+    data class Success(val tagId: ByteArray) : WriteNfcResult() {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+            other as Success
+            return tagId.contentEquals(other.tagId)
+        }
+
+        override fun hashCode(): Int {
+            return tagId.contentHashCode()
+        }
+    }
 
     data object DidNotOverwrite : WriteNfcResult()
 
@@ -52,3 +63,13 @@ private fun Ndef.isBlank(): Boolean {
 
     return isWellFormedBlankRecord
 }
+
+private fun buildMessage(habitId: String): NdefMessage =
+    NdefMessage(
+        NdefRecord.createExternal(
+            "com.mk.habittracker",
+            "habit_tag",
+            habitId.toByteArray(),
+        ),
+        NdefRecord.createApplicationRecord("com.mk.habittracker"),
+    )

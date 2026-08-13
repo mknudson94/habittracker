@@ -1,7 +1,5 @@
 package com.mk.habittracker.feature.pairnfc
 
-import android.nfc.NdefMessage
-import android.nfc.NdefRecord
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -31,7 +29,18 @@ sealed class PairNfcTagState {
         val message: String,
     ) : PairNfcTagState()
 
-    data object Success : PairNfcTagState()
+    data class Success(val tagId: ByteArray) : PairNfcTagState() {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+            other as Success
+            return tagId.contentEquals(other.tagId)
+        }
+
+        override fun hashCode(): Int {
+            return tagId.contentHashCode()
+        }
+    }
 }
 
 @HiltViewModel(assistedFactory = NfcPairingViewModel.Factory::class)
@@ -61,13 +70,13 @@ class NfcPairingViewModel @AssistedInject constructor(
                     val result =
                         writeNfcTagUseCase.execute(
                             tag = tag,
-                            message = buildMessage(),
+                            habitId = habitId,
                             shouldOverwrite =
                                 (_pairingState.value as? PairNfcTagState.ConfirmOverwrite)?.confirmed == true,
                         )
                     _pairingState.value =
                         when (result) {
-                            WriteNfcResult.Success -> PairNfcTagState.Success
+                            is WriteNfcResult.Success -> PairNfcTagState.Success(result.tagId)
                             WriteNfcResult.DidNotOverwrite -> PairNfcTagState.ConfirmOverwrite()
                             is WriteNfcResult.Error -> PairNfcTagState.Error(result.message)
                         }
@@ -100,7 +109,7 @@ class NfcPairingViewModel @AssistedInject constructor(
                         }
                     }
 
-                    is PairNfcTagState.Error, PairNfcTagState.Success -> {
+                    is PairNfcTagState.Error, is PairNfcTagState.Success -> {
                         Log.d("nfc", "[NfcPairingViewModel#init] canceling write job")
                         nfcReaderModeFlag.releaseReaderMode()
                         writeNfcTagJob?.cancel()
@@ -110,7 +119,6 @@ class NfcPairingViewModel @AssistedInject constructor(
     }
 
     override fun onCleared() {
-        super.onCleared()
         nfcReaderModeFlag.releaseReaderMode()
     }
 
@@ -123,14 +131,4 @@ class NfcPairingViewModel @AssistedInject constructor(
     fun tryAgain() {
         _pairingState.value = PairNfcTagState.ReadyToScan
     }
-
-    private fun buildMessage(): NdefMessage =
-        NdefMessage(
-            NdefRecord.createExternal(
-                "com.mk.habittracker",
-                "habit_tag",
-                habitId.toByteArray(),
-            ),
-            NdefRecord.createApplicationRecord("com.mk.habittracker"),
-        )
 }

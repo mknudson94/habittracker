@@ -43,6 +43,7 @@ fun AddHabitScreen(
         nameTextFieldState = vm.name,
         onSaveHabit = vm::saveHabit,
         onDismiss = onDismiss,
+        onTagPaired = vm::onTagPaired,
     )
 }
 
@@ -53,6 +54,7 @@ fun AddHabitScreen(
     nameTextFieldState: TextFieldState,
     onSaveHabit: () -> Unit,
     onDismiss: () -> Unit,
+    onTagPaired: (ByteArray) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val nfcBottomSheetState = rememberModalBottomSheetState()
@@ -118,6 +120,7 @@ fun AddHabitScreen(
             habitId = habitId,
             sheetState = nfcBottomSheetState,
             onDismiss = { showBottomSheet = false },
+            onTagPaired = onTagPaired,
         )
     }
 }
@@ -130,5 +133,6 @@ private fun AddHabitScreenPreview() {
         nameTextFieldState = TextFieldState("Brush teeth"),
         onDismiss = {},
         onSaveHabit = {},
+        onTagPaired = {},
     )
 }

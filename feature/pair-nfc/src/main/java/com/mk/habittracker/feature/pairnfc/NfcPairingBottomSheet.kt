@@ -50,6 +50,7 @@ fun NfcPairingBottomSheet(
     habitId: String,
     sheetState: SheetState,
     onDismiss: () -> Unit,
+    onTagPaired: (ByteArray) -> Unit = {},
 ) {
     val vm = hiltViewModel<NfcPairingViewModel, NfcPairingViewModel.Factory> { factory ->
         factory.create(habitId)
@@ -61,6 +62,7 @@ fun NfcPairingBottomSheet(
         onConfirmOverwrite = vm::confirmOverwrite,
         onTryAgain = vm::tryAgain,
         onDismiss = onDismiss,
+        onTagPaired = onTagPaired,
     )
 }
 
@@ -72,6 +74,7 @@ internal fun NfcPairingBottomSheet(
     onConfirmOverwrite: () -> Unit,
     onTryAgain: () -> Unit,
     onDismiss: () -> Unit,
+    onTagPaired: (ByteArray) -> Unit = {},
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -82,6 +85,7 @@ internal fun NfcPairingBottomSheet(
             onConfirmOverwrite = onConfirmOverwrite,
             onTryAgain = onTryAgain,
             onDismiss = onDismiss,
+            onTagPaired = onTagPaired,
         )
     }
 }
@@ -92,6 +96,7 @@ internal fun NfcPairingScreen(
     onConfirmOverwrite: () -> Unit,
     onTryAgain: () -> Unit,
     onDismiss: () -> Unit,
+    onTagPaired: (ByteArray) -> Unit = {},
 ) {
     Column(
         modifier = Modifier
@@ -187,7 +192,8 @@ internal fun NfcPairingScreen(
                 }
             }
 
-            PairNfcTagState.Success -> {
+            is PairNfcTagState.Success -> {
+                onTagPaired(pairingState.tagId)
                 Icon(
                     modifier = Modifier
                         .padding(32.dp)
@@ -333,7 +339,7 @@ private class PairingStatePreviewProvider : PreviewParameterProvider<PairNfcTagS
         get() = sequenceOf(
             PairNfcTagState.ReadyToScan,
             PairNfcTagState.Error("There was an error"),
-            PairNfcTagState.Success,
+            PairNfcTagState.Success(byteArrayOf(1, 2, 3)),
             PairNfcTagState.ConfirmOverwrite(false),
             PairNfcTagState.ConfirmOverwrite(true),
         )
