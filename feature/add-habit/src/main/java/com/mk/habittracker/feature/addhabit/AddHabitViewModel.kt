@@ -5,13 +5,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.mk.habittracker.core.data.HabitRepository
 import com.mk.habittracker.core.model.Habit
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -35,20 +33,18 @@ class AddHabitViewModel
         tagId = id
     }
 
-        fun saveHabit() {
-            viewModelScope.launch {
-                repository.addHabit(
-                    Habit(
-                        id = habitId,
-                        userId = userId,
-                        name = name.text.toString(),
-                        createdAt =
-                            java.time.Instant
-                                .now()
-                                .toEpochMilli(),
-                        tagId = tagId,
-                    ),
-                )
-            }
+    suspend fun saveHabit() {
+        repository.addHabit(
+            Habit(
+                id = habitId,
+                userId = userId,
+                name = name.text.toString(),
+                createdAt =
+                    java.time.Instant
+                        .now()
+                        .toEpochMilli(),
+                tagId = tagId,
+            ),
+        )
         }
     }
