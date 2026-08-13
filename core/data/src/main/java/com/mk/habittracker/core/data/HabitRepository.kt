@@ -2,6 +2,7 @@ package com.mk.habittracker.core.data
 
 import android.util.Log
 import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import com.mk.habittracker.core.database.HabitDao
 import com.mk.habittracker.core.database.asEntity
@@ -33,8 +34,8 @@ class HabitRepository @Inject constructor(
         }
     }
 
-    fun getHabit(userId: String, habitId: String): Flow<Habit> =
-        habitDao.getHabit(userId, habitId).map { it.asExternalModel() }
+    fun getHabit(userId: String, habitId: String): Flow<Habit?> =
+        habitDao.getHabit(userId, habitId).map { it?.asExternalModel() }
 
     private fun pullHabits(userId: String) {
         scope.launch {
@@ -63,6 +64,23 @@ class HabitRepository @Inject constructor(
                     .await()
             } catch (e: Exception) {
                 Log.e("HabitRepository", "Error pushing habit", e)
+            }
+        }
+    }
+
+    suspend fun updateHabitTagId(habitId: String, tagId: ByteArray) {
+        habitDao.updateHabitTagId(Firebase.auth.uid.orEmpty(), habitId, tagId)
+
+        scope.launch {
+            try {
+                db.collection("habits")
+                    .document(habitId)
+                    .update(mapOf("tag_id" to tagId))
+                    .await()
+            } catch (e: Exception) {
+                // If update fails because document doesn't exist, we might want to handle it,
+                // but in this flow, the document should be created by addHabit later or already exist.
+                Log.e("HabitRepository", "Error updating habit tag id", e)
             }
         }
     }

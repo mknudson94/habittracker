@@ -11,6 +11,11 @@ interface HabitDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addHabit(habit: HabitEntity)
 
+    @Query(
+        "UPDATE habit SET tag_id = :tagId WHERE user_id = :userId AND id = :habitId"
+    )
+    suspend fun updateHabitTagId(userId: String, habitId: String, tagId: ByteArray)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addHabits(habits: List<HabitEntity>)
 
