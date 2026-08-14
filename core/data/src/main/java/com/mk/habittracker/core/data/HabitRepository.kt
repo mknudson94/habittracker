@@ -68,23 +68,6 @@ class HabitRepository @Inject constructor(
         }
     }
 
-    suspend fun updateHabitTagId(habitId: String, tagId: ByteArray) {
-        habitDao.updateHabitTagId(Firebase.auth.uid.orEmpty(), habitId, tagId)
-
-        scope.launch {
-            try {
-                db.collection("habits")
-                    .document(habitId)
-                    .update(mapOf("tag_id" to tagId))
-                    .await()
-            } catch (e: Exception) {
-                // If update fails because document doesn't exist, we might want to handle it,
-                // but in this flow, the document should be created by addHabit later or already exist.
-                Log.e("HabitRepository", "Error updating habit tag id", e)
-            }
-        }
-    }
-
     fun getCheckIns(habitId: String, userId: String): Flow<List<CheckIn>> {
         pullCheckIns(habitId, userId)
         return habitDao.getCheckIns(habitId, userId).map { entities ->
@@ -143,5 +126,14 @@ class HabitRepository @Inject constructor(
                 Log.e("HabitRepository", "Error deleting check-in", e)
             }
         }
+    }
+
+    suspend fun hasCheckedInToday(habitId: String): Boolean =
+        habitDao.getCheckInForToday(Firebase.auth.uid.orEmpty(), habitId) != null
+
+    suspend fun getCurrentStreak(habitId: String): Int {
+        val streak = habitDao.getLatestStreak(habitId) ?: return 0
+        val lastLogged = LocalDate.parse(streak.lastDate)
+        return if (lastLogged == LocalDate.now()) streak.streakLength else 0
     }
 }

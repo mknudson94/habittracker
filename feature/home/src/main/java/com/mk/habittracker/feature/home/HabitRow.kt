@@ -27,6 +27,7 @@ import com.mk.habittracker.core.model.CheckIn
 import com.mk.habittracker.core.model.Habit
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import java.time.LocalDate
 
 @Composable
@@ -43,7 +44,9 @@ internal fun HabitRow(
 
     HabitRow(
         habit = habit,
-        checkIns = checkIns,
+        checkIns = checkIns
+            .take(DAYS_IN_WEEK)
+            .toImmutableList(),
         onClick = onClick,
         onToggleCheckIn = vm::toggleCheckIn,
     )

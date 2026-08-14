@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="already_logged_body">Already logged today</string>
     <string name="channel_name">Check-in confirmations</string>
     <string name="channel_description">Confirms when a habit is checked in</string>
-    <string name="check_in_notification_title">✓&#160;Checked in</string>
+    <string name="check_in_notification_title">%1$s logged</string>
     <string name="check_in_notification_content">You\'ve checked in for %1$s.</string>
     <string name="check_in_notification_content_generic">You\'ve checked in for your habit.</string>
     <string name="undo">Undo</string>
@@ -15,4 +16,8 @@
     <string name="nfc_uid_key" translatable="false">nfc_uid</string>
     <string name="nfc_habit_id_key" translatable="false">nfc_habit_id</string>
     <string name="nfc_checkin_channel_id" translatable="false">nfc_checkin_notification_channel</string>
+    <string name="streak_day_x">Day %1$d</string>
+    <string name="streak_becoming_habit">%1$d-day streak. This is becoming a habit.</string>
+    <string name="streak_in_a_row">%1$d days in a row.</string>
+    <string name="streak_first_one">First one down.</string>
 </resources>

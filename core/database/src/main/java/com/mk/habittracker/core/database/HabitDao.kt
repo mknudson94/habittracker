@@ -19,7 +19,11 @@ interface HabitDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addHabits(habits: List<HabitEntity>)
 
-    @Query("SELECT * FROM habit WHERE :userId = habit.user_id")
+    @Query(
+        "SELECT * FROM habit " +
+            "WHERE :userId = habit.user_id " +
+            "ORDER BY habit.name DESC"
+    )
     fun getHabits(userId: String): Flow<List<HabitEntity>>
 
     @Query(
@@ -36,9 +40,17 @@ interface HabitDao {
         "SELECT * FROM check_in " +
             "WHERE :habitId = check_in.habit_id " +
             "AND :userId = check_in.user_id " +
-            "AND julianday('now') - julianday(check_in.completed_date) <= 7",
+            "ORDER BY julianday(check_in.completed_date) DESC",
     )
     fun getCheckIns(habitId: String, userId: String): Flow<List<CheckInEntity>>
+
+    @Query(
+        "SELECT * FROM check_in " +
+            "WHERE :habitId = check_in.habit_id " +
+            "AND :userId = check_in.user_id " +
+            "AND date('now') = date(check_in.completed_date)",
+    )
+    suspend fun getCheckInForToday(userId: String, habitId: String): CheckInEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addCheckIn(checkIn: CheckInEntity)
@@ -55,4 +67,17 @@ interface HabitDao {
         habitId: String,
         date: String,
     )
+
+    @Query(
+        "WITH " +
+            "deduped AS (SELECT DISTINCT completed_date FROM check_in WHERE habit_id = :habitId), " +
+            "dated_rows AS (SELECT completed_date, " +
+            "CAST(julianday(completed_date) AS INTEGER) - ROW_NUMBER() OVER (ORDER BY completed_date) AS island " +
+            "FROM deduped), " +
+            "streak_groups AS (SELECT MAX(completed_date) AS last_date, COUNT(*) AS streak_length " +
+            "FROM dated_rows GROUP BY island) " +
+            "SELECT last_date, streak_length FROM streak_groups " +
+            "WHERE last_date = (SELECT MAX(last_date) FROM streak_groups)"
+    )
+    suspend fun getLatestStreak(habitId: String): StreakEntity?
 }
