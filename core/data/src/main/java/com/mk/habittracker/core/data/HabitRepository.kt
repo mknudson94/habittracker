@@ -1,14 +1,14 @@
 package com.mk.habittracker.core.data
 
 import android.util.Log
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
-import com.google.firebase.firestore.firestore
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.mk.habittracker.core.database.HabitDao
 import com.mk.habittracker.core.database.asEntity
 import com.mk.habittracker.core.database.asExternalModel
 import com.mk.habittracker.core.model.CheckIn
 import com.mk.habittracker.core.model.Habit
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -23,9 +23,11 @@ import javax.inject.Singleton
 @Singleton
 class HabitRepository @Inject constructor(
     private val habitDao: HabitDao,
+    private val db: FirebaseFirestore,
+    private val auth: FirebaseAuth,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private val db = Firebase.firestore
+    private val scope = CoroutineScope(SupervisorJob() + ioDispatcher)
 
     fun getHabits(userId: String): Flow<List<Habit>> {
         pullHabits(userId)
@@ -129,7 +131,7 @@ class HabitRepository @Inject constructor(
     }
 
     suspend fun hasCheckedInToday(habitId: String): Boolean =
-        habitDao.getCheckInForToday(Firebase.auth.uid.orEmpty(), habitId) != null
+        habitDao.getCheckInForToday(auth.uid.orEmpty(), habitId) != null
 
     suspend fun getCurrentStreak(habitId: String): Int {
         val streak = habitDao.getLatestStreak(habitId) ?: return 0
