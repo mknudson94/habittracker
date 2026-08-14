@@ -14,6 +14,22 @@ plugins {
     alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.ktlint) apply false
+    alias(libs.plugins.affected.module.detector)
+}
+
+affectedModuleDetector {
+    baseDir = rootDir.absolutePath
+    specifiedBranch = "origin/main"
+    compareFrom = "SpecifiedBranchCommitMergeBase"
+    pathsAffectingAllModules = setOf(
+        "build.gradle.kts",
+        "settings.gradle.kts",
+        "gradle/",
+        "gradlew",
+        "buildSrc/",
+        "gradle/libs.versions.toml"
+    )
+    ignoredFiles = setOf(".*\\.md", ".*\\.txt", ".*README")
 }
 
 dependencyAnalysis {

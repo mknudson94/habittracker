@@ -35,6 +35,7 @@ truth = "1.4.5"
 robolectric = "4.14.1"
 threetenabp = "1.4.9"
 workRuntimeKtx = "2.11.2"
+affectedModuleDetector = "0.6.2"
 
 [libraries]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
@@ -101,3 +102,4 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
+affected-module-detector = { id = "com.dropbox.affectedmoduledetector", version.ref = "affectedModuleDetector" }
