@@ -34,6 +34,7 @@ import com.mk.habittracker.core.model.CheckIn
 import com.mk.habittracker.core.model.Habit
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import java.time.LocalDate
 import java.time.format.TextStyle
 
@@ -51,7 +52,7 @@ internal fun HabitCard(
 
     HabitCard(
         habit = habit,
-        checkIns = checkIns,
+        checkIns = checkIns.toImmutableList(),
         onClick = onClick,
         onToggleCheckIn = vm::toggleCheckIn,
     )

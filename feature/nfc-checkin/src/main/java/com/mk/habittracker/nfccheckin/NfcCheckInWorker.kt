@@ -43,40 +43,61 @@ class NfcCheckInWorker @AssistedInject constructor(
         val tagId = this.inputData.getByteArray(NFC_UID_KEY)
         val habitId = this.inputData.getString(NFC_HABIT_ID_KEY) ?: error("null habit id")
 
-        nfcCheckInHandler.checkIn(
-            HabitTrackerNdef(
-                uid = tagId ?: byteArrayOf(),
-                habitId = habitId
-            )
-        )
-
-        sendNotification(habitId)
-
-        return Result.success()
-    }
-
-    private suspend fun sendNotification(habitId: String) {
-        Log.d("worker", "sending notification")
-
         val habit = auth.currentUser?.let {
             habitRepository.getHabit(it.uid, habitId).first()
         }!!
+        val alreadyCheckedIn = habitRepository.hasCheckedInToday(habitId = habitId)
+        val streakLength = habitRepository.getCurrentStreak(habitId)
 
-        val textTitle = appContext.getString(R.string.check_in_notification_title)
-        val textContent = habit.name
+        if (!alreadyCheckedIn) {
+            nfcCheckInHandler.checkIn(
+                HabitTrackerNdef(
+                    uid = tagId ?: byteArrayOf(),
+                    habitId = habitId
+                )
+            )
+        }
+        sendNotification(
+            habitId = habitId,
+            habitName = habit.name,
+            alreadyCheckedIn = alreadyCheckedIn,
+            streakLength = streakLength
+        )
+        return Result.success()
+    }
+
+    private fun sendNotification(
+        habitId: String,
+        habitName: String,
+        alreadyCheckedIn: Boolean,
+        streakLength: Int,
+    ) {
+        Log.d("worker", "sending notification")
+        val (textTitle, textContent) = getCheckInStringsFor(
+            habitName = habitName,
+            alreadyCheckedIn = alreadyCheckedIn,
+            streakLength = streakLength
+        )
         val notificationId = Random.nextInt()
         val contentIntent = buildCheckInPendingIntent(notificationId, habitId)
-        val undoIntent = buildUndoPendingIntent(notificationId, habitId)
 
         val builder = NotificationCompat.Builder(appContext, CHANNEL_ID)
             .setContentTitle(textTitle)
             .setContentText(textContent)
             .setSmallIcon(CoreR.drawable.priority_16dp)
-//            .setColor(0xFF15803D.toInt())
             .setContentIntent(contentIntent)
-            .addAction(R.drawable.undo, appContext.getString(R.string.undo), undoIntent)
             .setAutoCancel(true) // dismisses on-tap
-//            .setTimeoutAfter(NOTIFICATION_TIMEOUT) // dismiss automatically after short delay
+            .setTimeoutAfter(NOTIFICATION_TIMEOUT) // dismiss automatically after short delay
+            .apply {
+                if (!alreadyCheckedIn) {
+                    val undoIntent = buildUndoPendingIntent(notificationId, habitId)
+                    addAction(
+                        R.drawable.undo,
+                        appContext.getString(R.string.undo),
+                        undoIntent
+                    )
+                }
+            }
 
         with(NotificationManagerCompat.from(appContext)) {
             if (ActivityCompat.checkSelfPermission(
@@ -127,5 +148,25 @@ class NfcCheckInWorker @AssistedInject constructor(
             undoIntent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
+    }
+
+    private fun getCheckInStringsFor(
+        habitName: String,
+        alreadyCheckedIn: Boolean,
+        streakLength: Int,
+    ): Pair<String, String> {
+        if (alreadyCheckedIn) {
+            return habitName to appContext.getString(R.string.already_logged_body)
+        }
+
+        val title = appContext.getString(R.string.check_in_notification_title, habitName)
+        val body = when {
+            streakLength >= 30 -> appContext.getString(R.string.streak_day_x, streakLength)
+            streakLength >= 7 -> appContext.getString(R.string.streak_becoming_habit, streakLength)
+            streakLength >= 2 -> appContext.getString(R.string.streak_in_a_row, streakLength)
+            streakLength == 1 -> appContext.getString(R.string.streak_first_one)
+            else -> error("streak length should be greater than zero, was $streakLength")
+        }
+        return title to body
     }
 }

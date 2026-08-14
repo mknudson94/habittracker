@@ -5,7 +5,9 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.mk.habittracker.core.model.Habit
 
-@Entity(tableName = "habit")
+@Entity(
+    tableName = "habit",
+)
 data class HabitEntity(
     @PrimaryKey val id: String,
     @ColumnInfo(name = "user_id") val userId: String,

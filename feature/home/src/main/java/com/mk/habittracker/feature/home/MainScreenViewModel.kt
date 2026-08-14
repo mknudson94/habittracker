@@ -4,6 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.mk.habittracker.core.data.HabitRepository
+import com.mk.habittracker.core.model.CheckIn
+import com.mk.habittracker.core.model.Habit
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -13,9 +16,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import com.mk.habittracker.core.model.CheckIn
-import com.mk.habittracker.core.model.Habit
-import com.mk.habittracker.core.data.HabitRepository
 import java.time.LocalDate
 import javax.inject.Inject
 import kotlin.uuid.ExperimentalUuidApi
@@ -43,10 +43,9 @@ class MainScreenViewModel
                     initialValue = persistentListOf(),
                 )
 
-        fun getCheckIns(habitId: String): StateFlow<ImmutableList<CheckIn>> =
+    fun getCheckIns(habitId: String): StateFlow<List<CheckIn>> =
             repository
                 .getCheckIns(habitId, userId)
-                .map { it.toImmutableList() }
                 .stateIn(
                     scope = viewModelScope,
                     started = SharingStarted.WhileSubscribed(DEFAULT_STOP_TIMEOUT_MILLIS),
