@@ -74,10 +74,10 @@ interface HabitDao {
             "dated_rows AS (SELECT completed_date, " +
             "CAST(julianday(completed_date) AS INTEGER) - ROW_NUMBER() OVER (ORDER BY completed_date) AS island " +
             "FROM deduped), " +
-            "streak_groups AS (SELECT MAX(completed_date) AS last_date, COUNT(*) AS streak_length " +
+            "streak_groups AS (SELECT MAX(completed_date) AS lastDate, COUNT(*) AS streakLength " +
             "FROM dated_rows GROUP BY island) " +
-            "SELECT last_date, streak_length FROM streak_groups " +
-            "WHERE last_date = (SELECT MAX(last_date) FROM streak_groups)"
+            "SELECT lastDate, streakLength FROM streak_groups " +
+            "WHERE lastDate = (SELECT MAX(lastDate) FROM streak_groups)"
     )
     suspend fun getLatestStreak(habitId: String): StreakEntity?
 }
