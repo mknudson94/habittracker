@@ -84,9 +84,10 @@ fun HabitDetailScreen(
         onBack = onBack,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             NfcSection(
@@ -96,16 +97,18 @@ fun HabitDetailScreen(
             // CheckInHeatmap(checkIns = checkIns)
             ElevatedCard(modifier = Modifier.fillMaxWidth()) {
                 Box(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth(),
-                    contentAlignment = Alignment.Center
+                    modifier =
+                        Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(),
+                    contentAlignment = Alignment.Center,
                 ) {
                     CheckInWeeklyCompletions(
-                        checkInsByWeek = checkIns
-                            .groupingBy { it.completedDate.get(WeekFields.ISO.weekOfYear()) }
-                            .eachCount()
-                            .toPersistentMap()
+                        checkInsByWeek =
+                            checkIns
+                                .groupingBy { it.completedDate.get(WeekFields.ISO.weekOfYear()) }
+                                .eachCount()
+                                .toPersistentMap(),
                     )
                 }
             }
@@ -130,30 +133,36 @@ private fun NfcSection(onClick: () -> Unit) {
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(
                 text = "PHYSICAL TRIGGER",
                 style = MaterialTheme.typography.labelLarge,
             )
             Row(
-                modifier = Modifier.height(IntrinsicSize.Min)
+                modifier = Modifier.height(IntrinsicSize.Min),
             ) {
                 Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .aspectRatio(1f)
-                        .drawBehind {
-                            drawCircle(
-                                color = Color.Black,
-                                alpha = .7f,
-                                style = Stroke(
-                                    width = 1.dp.toPx(),
-                                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(8f, 8f), 0f)
+                    modifier =
+                        Modifier
+                            .fillMaxHeight()
+                            .aspectRatio(1f)
+                            .drawBehind {
+                                drawCircle(
+                                    color = Color.Black,
+                                    alpha = .7f,
+                                    style =
+                                        Stroke(
+                                            width = 1.dp.toPx(),
+                                            pathEffect =
+                                                PathEffect.dashPathEffect(
+                                                    floatArrayOf(8f, 8f),
+                                                    0f,
+                                                ),
+                                        ),
                                 )
-                            )
-                        },
-                    contentAlignment = Alignment.Center
+                            },
+                    contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.outline_add_link_24),
@@ -169,7 +178,7 @@ private fun NfcSection(onClick: () -> Unit) {
                     )
                     Text(
                         text = "Tap to pair a physical object",
-                        style = MaterialTheme.typography.bodySmall
+                        style = MaterialTheme.typography.bodySmall,
                     )
                 }
             }
@@ -205,36 +214,37 @@ private fun HabitDetailScreenPreview() {
     )
 }
 
-private val previewDates = listOf(
-    "2026-06-15",
-    "2026-06-16",
-    "2026-06-18",
-    "2026-06-20",
-    "2026-06-21",
-    "2026-06-23",
-    "2026-06-24",
-    "2026-06-27",
-    "2026-06-28",
-    "2026-06-29",
-    "2026-07-01",
-    "2026-07-02",
-    "2026-07-04",
-    "2026-07-05",
-    "2026-07-12",
-    "2026-07-14",
-    "2026-07-15",
-    "2026-07-17",
-    "2026-07-18",
-    "2026-07-20",
-    "2026-07-22",
-    "2026-07-23",
-    "2026-07-25",
-    "2026-07-26",
-    "2026-07-28",
-    "2026-07-29",
-    "2026-07-30",
-    "2026-08-01",
-    "2026-08-02",
-)
+private val previewDates =
+    listOf(
+        "2026-06-15",
+        "2026-06-16",
+        "2026-06-18",
+        "2026-06-20",
+        "2026-06-21",
+        "2026-06-23",
+        "2026-06-24",
+        "2026-06-27",
+        "2026-06-28",
+        "2026-06-29",
+        "2026-07-01",
+        "2026-07-02",
+        "2026-07-04",
+        "2026-07-05",
+        "2026-07-12",
+        "2026-07-14",
+        "2026-07-15",
+        "2026-07-17",
+        "2026-07-18",
+        "2026-07-20",
+        "2026-07-22",
+        "2026-07-23",
+        "2026-07-25",
+        "2026-07-26",
+        "2026-07-28",
+        "2026-07-29",
+        "2026-07-30",
+        "2026-08-01",
+        "2026-08-02",
+    )
 
 private val previewCheckIns = previewDates.map { checkIn(it) }

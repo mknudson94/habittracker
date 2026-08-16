@@ -16,7 +16,7 @@ import java.time.LocalDate
             parentColumns = arrayOf("id"),
             childColumns = arrayOf("habit_id"),
             onUpdate = ForeignKey.CASCADE,
-            onDelete = ForeignKey.CASCADE
+            onDelete = ForeignKey.CASCADE,
         ),
     ],
 )
@@ -28,18 +28,20 @@ data class CheckInEntity(
     @ColumnInfo(name = "nfc_tag_uid", typeAffinity = ColumnInfo.BLOB) val nfcUid: ByteArray? = null,
 )
 
-fun CheckInEntity.asExternalModel() = CheckIn(
-    id = id,
-    habitId = habitId,
-    userId = userId,
-    completedDate = completedDate,
-    nfcUid = nfcUid
-)
+fun CheckInEntity.asExternalModel() =
+    CheckIn(
+        id = id,
+        habitId = habitId,
+        userId = userId,
+        completedDate = completedDate,
+        nfcUid = nfcUid,
+    )
 
-fun CheckIn.asEntity() = CheckInEntity(
-    id = id,
-    habitId = habitId,
-    userId = userId,
-    completedDate = completedDate,
-    nfcUid = nfcUid
-)
+fun CheckIn.asEntity() =
+    CheckInEntity(
+        id = id,
+        habitId = habitId,
+        userId = userId,
+        completedDate = completedDate,
+        nfcUid = nfcUid,
+    )

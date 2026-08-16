@@ -44,9 +44,10 @@ internal fun HabitRow(
 
     HabitRow(
         habit = habit,
-        checkIns = checkIns
-            .take(DAYS_IN_WEEK)
-            .toImmutableList(),
+        checkIns =
+            checkIns
+                .take(DAYS_IN_WEEK)
+                .toImmutableList(),
         onClick = onClick,
         onToggleCheckIn = vm::toggleCheckIn,
     )

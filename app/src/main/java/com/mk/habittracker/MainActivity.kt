@@ -30,15 +30,16 @@ class MainActivity : ComponentActivity() {
 
     @Inject lateinit var nfcCheckInHandler: NfcCheckInHandler
 
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            Log.d("MainActivity", "Notification permission granted")
-        } else {
-            Log.w("MainActivity", "Notification permission denied")
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission(),
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                Log.d("MainActivity", "Notification permission granted")
+            } else {
+                Log.w("MainActivity", "Notification permission denied")
+            }
         }
-    }
 
     override fun onNewIntent(intent: Intent) {
         Log.d("intent", "handling intent: ${intent.asString()}")
@@ -57,8 +58,6 @@ class MainActivity : ComponentActivity() {
 
         lifecycle.addObserver(nfcReaderModeController)
         lifecycle.addObserver(nfcCheckInHandler)
-
-
 
         enableEdgeToEdge()
         setContent {

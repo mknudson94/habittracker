@@ -1,0 +1,34 @@
+[LIFECYCLE] [amd] projects evaluated
+[INFO] [amd] initializing ProjectGraph
+[INFO] [amd] creating node for :app
+[INFO] [amd] relative path: app , sections: [app]
+[INFO] [amd] creating node for :core
+[INFO] [amd] relative path: core , sections: [core]
+[INFO] [amd] creating node for :feature
+[INFO] [amd] relative path: feature , sections: [feature]
+[INFO] [amd] creating node for :core:common
+[INFO] [amd] relative path: core/common , sections: [core, common]
+[INFO] [amd] creating node for :core:data
+[INFO] [amd] relative path: core/data , sections: [core, data]
+[INFO] [amd] creating node for :core:database
+[INFO] [amd] relative path: core/database , sections: [core, database]
+[INFO] [amd] creating node for :core:model
+[INFO] [amd] relative path: core/model , sections: [core, model]
+[INFO] [amd] creating node for :core:nfc
+[INFO] [amd] relative path: core/nfc , sections: [core, nfc]
+[INFO] [amd] creating node for :core:ui
+[INFO] [amd] relative path: core/ui , sections: [core, ui]
+[INFO] [amd] creating node for :feature:add-habit
+[INFO] [amd] relative path: feature/add-habit , sections: [feature, add-habit]
+[INFO] [amd] creating node for :feature:auth
+[INFO] [amd] relative path: feature/auth , sections: [feature, auth]
+[INFO] [amd] creating node for :feature:habit-detail
+[INFO] [amd] relative path: feature/habit-detail , sections: [feature, habit-detail]
+[INFO] [amd] creating node for :feature:home
+[INFO] [amd] relative path: feature/home , sections: [feature, home]
+[INFO] [amd] creating node for :feature:nfc-checkin
+[INFO] [amd] relative path: feature/nfc-checkin , sections: [feature, nfc-checkin]
+[INFO] [amd] creating node for :feature:pair-nfc
+[INFO] [amd] relative path: feature/pair-nfc , sections: [feature, pair-nfc]
+[INFO] [amd] finished creating ProjectGraph
+[INFO] [amd] Using real detector with ALL_AFFECTED_PROJECTS

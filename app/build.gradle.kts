@@ -55,7 +55,6 @@ dependencies {
     implementation(project(":feature:pair-nfc"))
     implementation(project(":feature:nfc-checkin"))
 
-
     compileOnly(libs.errorprone.annotations)
 
     ksp(libs.androidx.room.compiler)

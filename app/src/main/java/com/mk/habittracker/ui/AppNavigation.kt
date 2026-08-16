@@ -40,16 +40,15 @@ data object SignupRoute : NavKey
 
 @Suppress("ktlint:compose:vm-injection-check")
 @Composable
-fun AppNavigation(
-    viewModel: LoginViewModel = hiltViewModel(),
-) {
+fun AppNavigation(viewModel: LoginViewModel = hiltViewModel()) {
     val user by viewModel.authState.collectAsStateWithLifecycle()
 
-    val backStack = if (user == null) {
-        rememberNavBackStack(LoginRoute)
-    } else {
-        rememberNavBackStack(HomeRoute)
-    }
+    val backStack =
+        if (user == null) {
+            rememberNavBackStack(LoginRoute)
+        } else {
+            rememberNavBackStack(HomeRoute)
+        }
 
     NavDisplay(
         backStack = backStack,
@@ -97,7 +96,7 @@ fun AppNavigation(
                 }
                 entry<SignupRoute> {
                     SignupScreen(
-                        onCancel = { backStack.removeLastOrNull() }
+                        onCancel = { backStack.removeLastOrNull() },
                     )
                 }
             },

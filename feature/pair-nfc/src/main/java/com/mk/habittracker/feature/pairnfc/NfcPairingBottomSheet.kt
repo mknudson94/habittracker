@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -50,11 +51,12 @@ fun NfcPairingBottomSheet(
     habitId: String,
     sheetState: SheetState,
     onDismiss: () -> Unit,
-    onTagPaired: (ByteArray) -> Unit = {},
+    onPairTag: (ByteArray) -> Unit = {},
 ) {
-    val vm = hiltViewModel<NfcPairingViewModel, NfcPairingViewModel.Factory> { factory ->
-        factory.create(habitId)
-    }
+    val vm =
+        hiltViewModel<NfcPairingViewModel, NfcPairingViewModel.Factory> { factory ->
+            factory.create(habitId)
+        }
     val pairingState by vm.pairingState.collectAsStateWithLifecycle()
     NfcPairingBottomSheet(
         pairingState = pairingState,
@@ -62,7 +64,7 @@ fun NfcPairingBottomSheet(
         onConfirmOverwrite = vm::confirmOverwrite,
         onTryAgain = vm::tryAgain,
         onDismiss = onDismiss,
-        onTagPaired = onTagPaired,
+        onPairTag = onPairTag,
     )
 }
 
@@ -74,7 +76,7 @@ internal fun NfcPairingBottomSheet(
     onConfirmOverwrite: () -> Unit,
     onTryAgain: () -> Unit,
     onDismiss: () -> Unit,
-    onTagPaired: (ByteArray) -> Unit = {},
+    onPairTag: (ByteArray) -> Unit = {},
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -85,7 +87,7 @@ internal fun NfcPairingBottomSheet(
             onConfirmOverwrite = onConfirmOverwrite,
             onTryAgain = onTryAgain,
             onDismiss = onDismiss,
-            onTagPaired = onTagPaired,
+            onPairTag = onPairTag,
         )
     }
 }
@@ -96,12 +98,13 @@ internal fun NfcPairingScreen(
     onConfirmOverwrite: () -> Unit,
     onTryAgain: () -> Unit,
     onDismiss: () -> Unit,
-    onTagPaired: (ByteArray) -> Unit = {},
+    onPairTag: (ByteArray) -> Unit = {},
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
@@ -109,38 +112,8 @@ internal fun NfcPairingScreen(
             PairNfcTagState.ReadyToScan -> {
                 val primary = MaterialTheme.colorScheme.primary
                 Icon(
-                    modifier = Modifier
-                        .padding(32.dp)
-                        .size(64.dp)
-                        .doublePulseEffect(
-                            initialScale = .6f,
-                            targetScale = 2f,
-                            durationMillis = 1800,
-                            delay1 = .1f,
-                            delay2 = .3f,
-                        )
-                        .gradientCircleBackground(primary)
-                        .drawBehind {
-                            drawCircle(
-                                color = Color.White,
-                                radius = size.minDimension / 2f * .74f
-                            )
-                        },
-                    painter = painterResource(R.drawable.contactless),
-                    contentDescription = "",
-                )
-                Text("Ready to pair", style = MaterialTheme.typography.displaySmall)
-                Text("Hold your phone near the NFC tag")
-                TextButton(onClick = onDismiss) {
-                    Text("Cancel")
-                }
-            }
-
-            is PairNfcTagState.ConfirmOverwrite -> {
-                if (pairingState.confirmed) {
-                    val primary = MaterialTheme.colorScheme.primary
-                    Icon(
-                        modifier = Modifier
+                    modifier =
+                        Modifier
                             .padding(32.dp)
                             .size(64.dp)
                             .doublePulseEffect(
@@ -149,101 +122,149 @@ internal fun NfcPairingScreen(
                                 durationMillis = 1800,
                                 delay1 = .1f,
                                 delay2 = .3f,
-                            )
-                            .gradientCircleBackground(primary)
+                            ).gradientCircleBackground(primary)
                             .drawBehind {
                                 drawCircle(
                                     color = Color.White,
-                                    radius = size.minDimension / 2f * .74f
+                                    radius = size.minDimension / 2f * .74f,
                                 )
                             },
+                    painter = painterResource(R.drawable.contactless),
+                    contentDescription = "",
+                )
+                Text(
+                    text = stringResource(R.string.nfc_pairing_ready_to_pair),
+                    style = MaterialTheme.typography.displaySmall,
+                )
+                Text(text = stringResource(R.string.nfc_pairing_hold_near_tag))
+                TextButton(onClick = onDismiss) {
+                    Text(text = stringResource(R.string.nfc_pairing_cancel))
+                }
+            }
+
+            is PairNfcTagState.ConfirmOverwrite -> {
+                if (pairingState.confirmed) {
+                    val primary = MaterialTheme.colorScheme.primary
+                    Icon(
+                        modifier =
+                            Modifier
+                                .padding(32.dp)
+                                .size(64.dp)
+                                .doublePulseEffect(
+                                    initialScale = .6f,
+                                    targetScale = 2f,
+                                    durationMillis = 1800,
+                                    delay1 = .1f,
+                                    delay2 = .3f,
+                                ).gradientCircleBackground(primary)
+                                .drawBehind {
+                                    drawCircle(
+                                        color = Color.White,
+                                        radius = size.minDimension / 2f * .74f,
+                                    )
+                                },
                         painter = painterResource(R.drawable.contactless),
                         contentDescription = "",
                     )
-                    Text("Ready to overwrite", style = MaterialTheme.typography.displaySmall)
-                    Text("Hold your phone near the NFC tag")
+                    Text(
+                        text = stringResource(R.string.nfc_pairing_ready_to_overwrite),
+                        style = MaterialTheme.typography.displaySmall,
+                    )
+                    Text(text = stringResource(R.string.nfc_pairing_hold_near_tag))
                 } else {
                     Icon(
-                        modifier = Modifier
-                            .padding(32.dp)
-                            .size(64.dp)
-                            .gradientCircleBackground(MaterialTheme.colorScheme.error)
-                            .drawBehind {
-                                drawCircle(
-                                    color = Color.White,
-                                    radius = size.minDimension / 2f * .74f
-                                )
-                            },
+                        modifier =
+                            Modifier
+                                .padding(32.dp)
+                                .size(64.dp)
+                                .gradientCircleBackground(MaterialTheme.colorScheme.error)
+                                .drawBehind {
+                                    drawCircle(
+                                        color = Color.White,
+                                        radius = size.minDimension / 2f * .74f,
+                                    )
+                                },
                         painter = painterResource(R.drawable.contactless),
                         contentDescription = "",
                     )
-                    Text("Already paired", style = MaterialTheme.typography.displaySmall)
                     Text(
-                        text = "This tag is already paired with <Habit>. Do you want to overwrite it?",
-                        textAlign = TextAlign.Center
+                        text = stringResource(R.string.nfc_pairing_already_paired),
+                        style = MaterialTheme.typography.displaySmall,
+                    )
+                    Text(
+                        text = stringResource(R.string.nfc_pairing_already_paired_message),
+                        textAlign = TextAlign.Center,
                     )
                     TextButton(onConfirmOverwrite) {
-                        Text("Overwrite")
+                        Text(text = stringResource(R.string.nfc_pairing_overwrite))
                     }
                 }
 
                 TextButton(onClick = onDismiss) {
-                    Text("Cancel")
+                    Text(text = stringResource(R.string.nfc_pairing_cancel))
                 }
             }
 
             is PairNfcTagState.Success -> {
-                onTagPaired(pairingState.tagId)
+                onPairTag(pairingState.tagId)
                 Icon(
-                    modifier = Modifier
-                        .padding(32.dp)
-                        .size(64.dp)
-                        .gradientCircleBackground(Color.Green)
-                        .drawBehind {
-                            drawCircle(
-                                color = Color.White,
-                                radius = size.minDimension / 2f * .74f
-                            )
-                        },
+                    modifier =
+                        Modifier
+                            .padding(32.dp)
+                            .size(64.dp)
+                            .gradientCircleBackground(Color.Green)
+                            .drawBehind {
+                                drawCircle(
+                                    color = Color.White,
+                                    radius = size.minDimension / 2f * .74f,
+                                )
+                            },
                     painter = painterResource(R.drawable.success_alt),
                     contentDescription = "",
                 )
-                Text("Success", style = MaterialTheme.typography.displaySmall)
-                Text("You can now tap your phone to the tag to log this habit")
+                Text(
+                    text = stringResource(R.string.nfc_pairing_success),
+                    style = MaterialTheme.typography.displaySmall,
+                )
+                Text(text = stringResource(R.string.nfc_pairing_success_message))
                 TextButton(onClick = onDismiss) {
-                    Text("Done")
+                    Text(text = stringResource(R.string.nfc_pairing_done))
                 }
             }
 
             is PairNfcTagState.Error -> {
                 Icon(
-                    modifier = Modifier
-                        .padding(32.dp)
-                        .size(64.dp)
-                        .gradientCircleBackground(Color.Red)
-                        .drawBehind {
-                            drawCircle(
-                                color = Color.White,
-                                radius = size.minDimension / 2f * .74f
-                            )
-                        },
+                    modifier =
+                        Modifier
+                            .padding(32.dp)
+                            .size(64.dp)
+                            .gradientCircleBackground(Color.Red)
+                            .drawBehind {
+                                drawCircle(
+                                    color = Color.White,
+                                    radius = size.minDimension / 2f * .74f,
+                                )
+                            },
                     painter = painterResource(R.drawable.contactless),
                     contentDescription = "",
                 )
-                Text("Couldn't read tag", style = MaterialTheme.typography.displaySmall)
                 Text(
-                    text = "Make sure to hold the tag still against the center of your phone",
+                    text = stringResource(R.string.nfc_pairing_error_title),
+                    style = MaterialTheme.typography.displaySmall,
+                )
+                Text(
+                    text = stringResource(R.string.nfc_pairing_error_message),
                     textAlign = TextAlign.Center,
                 )
                 Row(
-                    horizontalArrangement = Arrangement.Center
+                    horizontalArrangement = Arrangement.Center,
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text("Skip for now")
+                        Text(text = stringResource(R.string.nfc_pairing_skip))
                     }
                     Spacer(Modifier.width(16.dp))
                     Button(onClick = onTryAgain) {
-                        Text("Try again")
+                        Text(text = stringResource(R.string.nfc_pairing_try_again))
                     }
                 }
             }
@@ -257,16 +278,17 @@ fun Modifier.pulseEffect(
     initialScale: Float = 1f,
     brush: Brush = SolidColor(MaterialTheme.colorScheme.secondary),
     shape: Shape = CircleShape,
-    animationSpec: DurationBasedAnimationSpec<Float> = tween(1500)
+    animationSpec: DurationBasedAnimationSpec<Float> = tween(1500),
 ): Modifier {
-    val pulseTransition = rememberInfiniteTransition(
-        label = "PulseTransition"
-    )
+    val pulseTransition =
+        rememberInfiniteTransition(
+            label = "PulseTransition",
+        )
     val pulseScale by pulseTransition.animateFloat(
         initialValue = initialScale,
         targetValue = targetScale,
         animationSpec = infiniteRepeatable(animationSpec),
-        label = "PulseScale"
+        label = "PulseScale",
     )
     val pulseAlpha by pulseTransition.animateFloat(
         initialValue = 1f,
@@ -295,61 +317,62 @@ fun Modifier.doublePulseEffect(
     durationMillis: Int = 1500,
     delay1: Float = 0f,
     delay2: Float = .4f,
-): Modifier {
-    return this
+): Modifier =
+    this
         .pulseEffect(
             targetScale = targetScale,
             initialScale = initialScale,
             brush = brush,
             shape = shape,
-            animationSpec = tween(
-                durationMillis = (durationMillis * (1 - delay1)).roundToInt(),
-                delayMillis = (durationMillis * delay1).roundToInt(),
-            ),
-        )
-        .pulseEffect(
+            animationSpec =
+                tween(
+                    durationMillis = (durationMillis * (1 - delay1)).roundToInt(),
+                    delayMillis = (durationMillis * delay1).roundToInt(),
+                ),
+        ).pulseEffect(
             targetScale = targetScale,
             initialScale = initialScale,
             brush = brush,
             shape = shape,
-            animationSpec = tween(
-                durationMillis = (durationMillis * (1 - delay2)).roundToInt(),
-                delayMillis = (durationMillis * delay2).roundToInt(),
-            ),
+            animationSpec =
+                tween(
+                    durationMillis = (durationMillis * (1 - delay2)).roundToInt(),
+                    delayMillis = (durationMillis * delay2).roundToInt(),
+                ),
         )
-}
 
-private fun Modifier.gradientCircleBackground(color: Color): Modifier {
-    return this.drawBehind {
+private fun Modifier.gradientCircleBackground(color: Color): Modifier =
+    this.drawBehind {
         drawCircle(
-            brush = Brush.radialGradient(
-                0.0f to color.copy(alpha = .8f),
-                0.9f to color.copy(alpha = .7f),
-                1.35f to color.copy(alpha = .55f),
-                1.5f to color.copy(alpha = .4f),
-            ),
+            brush =
+                Brush.radialGradient(
+                    0.0f to color.copy(alpha = .8f),
+                    0.9f to color.copy(alpha = .7f),
+                    1.35f to color.copy(alpha = .55f),
+                    1.5f to color.copy(alpha = .4f),
+                ),
             radius = size.minDimension / 2f * 1.5f,
-            alpha = .8f
+            alpha = .8f,
         )
     }
-}
 
 private class PairingStatePreviewProvider : PreviewParameterProvider<PairNfcTagState> {
     override val values: Sequence<PairNfcTagState>
-        get() = sequenceOf(
-            PairNfcTagState.ReadyToScan,
-            PairNfcTagState.Error("There was an error"),
-            PairNfcTagState.Success(byteArrayOf(1, 2, 3)),
-            PairNfcTagState.ConfirmOverwrite(false),
-            PairNfcTagState.ConfirmOverwrite(true),
-        )
+        get() =
+            sequenceOf(
+                PairNfcTagState.ReadyToScan,
+                PairNfcTagState.Error("There was an error"),
+                PairNfcTagState.Success(byteArrayOf(1, 2, 3)),
+                PairNfcTagState.ConfirmOverwrite(false),
+                PairNfcTagState.ConfirmOverwrite(true),
+            )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
 private fun NfcPairingScreenPreview(
-    @PreviewParameter(PairingStatePreviewProvider::class) pairingState: PairNfcTagState
+    @PreviewParameter(PairingStatePreviewProvider::class) pairingState: PairNfcTagState,
 ) {
     NfcPairingScreen(
         pairingState = pairingState,

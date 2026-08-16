@@ -50,7 +50,6 @@ fun LoginScreen(
         onSignIn = viewModel::signIn,
         modifier = modifier,
     )
-
 }
 
 @Composable
@@ -65,12 +64,13 @@ fun LoginScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    Scaffold { paddingValues ->
+    Scaffold(modifier = modifier) { paddingValues ->
         Column(
-            modifier = modifier
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp)
-                .fillMaxSize(),
+            modifier =
+                Modifier
+                    .padding(paddingValues)
+                    .padding(horizontal = 16.dp)
+                    .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -95,7 +95,7 @@ fun LoginScreen(
                     scope.launch {
                         onSignIn(email.text.toString(), password.text.toString())
                     }
-                }
+                },
             ) {
                 Text("Sign in")
             }
@@ -109,41 +109,41 @@ fun LoginScreen(
             }
             OutlinedButton(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = { onSignInWithGoogle(context) }
+                onClick = { onSignInWithGoogle(context) },
             ) {
                 Icon(
                     painter = painterResource(R.drawable.google),
                     contentDescription = "google logo",
                     tint = Color.Unspecified,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
                 )
                 Spacer(Modifier.width(8.dp))
                 Text("Continue with Google")
             }
-            val annotatedText = buildAnnotatedString {
-                append("Don't have an account?  ")
+            val annotatedText =
+                buildAnnotatedString {
+                    append("Don't have an account?  ")
 
-                pushLink(
-                    LinkAnnotation.Clickable(
-                        tag = "Sign up",
-                        linkInteractionListener = {
-                            onSignupClick()
-                        },
+                    pushLink(
+                        LinkAnnotation.Clickable(
+                            tag = "Sign up",
+                            linkInteractionListener = {
+                                onSignupClick()
+                            },
+                        ),
                     )
-                )
-                pushStyle(
-                    SpanStyle(
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                    pushStyle(
+                        SpanStyle(
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                        ),
                     )
-                )
-                append(text = "Sign up")
-            }
+                    append(text = "Sign up")
+                }
             Text(annotatedText)
         }
     }
-
 }
 
 @Composable

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nfc_pairing_ready_to_pair">Ready to pair</string>
+    <string name="nfc_pairing_hold_near_tag">Hold your phone near the NFC tag</string>
+    <string name="nfc_pairing_cancel">Cancel</string>
+    <string name="nfc_pairing_ready_to_overwrite">Ready to overwrite</string>
+    <string name="nfc_pairing_already_paired">Already paired</string>
+    <string name="nfc_pairing_already_paired_message">This tag is already paired with another habit. Do you want to overwrite it?</string>
+    <string name="nfc_pairing_overwrite">Overwrite</string>
+    <string name="nfc_pairing_success">Success</string>
+    <string name="nfc_pairing_success_message">You can now tap your phone to the tag to log this habit</string>
+    <string name="nfc_pairing_done">Done</string>
+    <string name="nfc_pairing_error_title">Couldn\'t read tag</string>
+    <string name="nfc_pairing_error_message">Make sure to hold the tag still against the center of your phone</string>
+    <string name="nfc_pairing_skip">Skip for now</string>
+    <string name="nfc_pairing_try_again">Try again</string>
+</resources>

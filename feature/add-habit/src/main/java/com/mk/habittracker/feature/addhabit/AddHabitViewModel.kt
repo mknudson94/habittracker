@@ -23,28 +23,28 @@ class AddHabitViewModel
     ) : ViewModel() {
         val habitId = Uuid.random().toString()
         val name = TextFieldState()
-    var tagId by mutableStateOf<ByteArray?>(null)
-        private set
+        var tagId by mutableStateOf<ByteArray?>(null)
+            private set
 
         private val userId: String
             get() = Firebase.auth.currentUser?.uid ?: "anonymous"
 
-    fun onTagPaired(id: ByteArray) {
-        tagId = id
-    }
+        fun onTagPaired(id: ByteArray) {
+            tagId = id
+        }
 
-    suspend fun saveHabit() {
-        repository.addHabit(
-            Habit(
-                id = habitId,
-                userId = userId,
-                name = name.text.toString(),
-                createdAt =
-                    java.time.Instant
-                        .now()
-                        .toEpochMilli(),
-                tagId = tagId,
-            ),
-        )
+        suspend fun saveHabit() {
+            repository.addHabit(
+                Habit(
+                    id = habitId,
+                    userId = userId,
+                    name = name.text.toString(),
+                    createdAt =
+                        java.time.Instant
+                            .now()
+                            .toEpochMilli(),
+                    tagId = tagId,
+                ),
+            )
         }
     }

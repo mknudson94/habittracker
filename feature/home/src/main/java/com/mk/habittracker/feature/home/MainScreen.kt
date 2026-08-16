@@ -55,7 +55,7 @@ fun MainScreen(
                 habit = habit,
                 onClick = { onHabitClick(habit.id) },
             )
-        }
+        },
     )
 }
 
@@ -82,7 +82,7 @@ fun MainScreen(
                             contentDescription = "log out",
                         )
                     }
-                }
+                },
             )
         },
         floatingActionButton = {
@@ -103,16 +103,16 @@ fun MainScreen(
                     .padding(horizontal = 16.dp)
                     .verticalScroll(rememberScrollState())
                     .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = MaterialTheme.colorScheme.primaryContainer,
-                        shape = RoundedCornerShape(8.dp)
-                    )
-                    .padding(8.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .background(
+                            color = MaterialTheme.colorScheme.primaryContainer,
+                            shape = RoundedCornerShape(8.dp),
+                        ).padding(8.dp),
             ) {
                 Image(
                     painter = painterResource(R.drawable.hero_doodle),
@@ -122,18 +122,19 @@ fun MainScreen(
                 val locale =
                     ConfigurationCompat.getLocales(config).get(0)
                         ?: LocaleListCompat.getDefault()[0]!!
-                val dateString = LocalDate.now().format(
-                    DateTimeFormatter.ofPattern("EEEE, MMMM dd", locale),
-                )
+                val dateString =
+                    LocalDate.now().format(
+                        DateTimeFormatter.ofPattern("EEEE, MMMM dd", locale),
+                    )
                 Column(Modifier.padding(start = 8.dp)) {
                     Text(
                         text = dateString.uppercase(),
                         style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                     )
                     Text(
                         text = "0 of 3 habits done today",
-                        style = MaterialTheme.typography.headlineSmall
+                        style = MaterialTheme.typography.headlineSmall,
                     )
                 }
             }
@@ -150,20 +151,21 @@ fun MainScreen(
 @Composable
 private fun MainScreenPreview() {
     MainScreen(
-        habits = persistentListOf(
-            Habit(
-                id = "1",
-                userId = "1",
-                name = "Drink water",
-                createdAt = 0L,
+        habits =
+            persistentListOf(
+                Habit(
+                    id = "1",
+                    userId = "1",
+                    name = "Drink water",
+                    createdAt = 0L,
+                ),
+                Habit(
+                    id = "2",
+                    userId = "1",
+                    name = "Exercise",
+                    createdAt = 0L,
+                ),
             ),
-            Habit(
-                id = "2",
-                userId = "1",
-                name = "Exercise",
-                createdAt = 0L,
-            )
-        ),
         habitRow = { habit ->
             HabitCard(
                 habit = habit,
@@ -171,6 +173,6 @@ private fun MainScreenPreview() {
                 onClick = {},
                 onToggleCheckIn = { _, _ -> },
             )
-        }
+        },
     )
 }

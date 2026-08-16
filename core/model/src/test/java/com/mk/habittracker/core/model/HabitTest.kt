@@ -4,17 +4,17 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 class HabitTest {
-
     @Test
     fun `Habit toMap returns expected map`() {
         val tagId = byteArrayOf(1, 2, 3)
-        val habit = Habit(
-            id = "habit1",
-            userId = "user1",
-            name = "Exercise",
-            createdAt = 123456789L,
-            tagId = tagId
-        )
+        val habit =
+            Habit(
+                id = "habit1",
+                userId = "user1",
+                name = "Exercise",
+                createdAt = 123456789L,
+                tagId = tagId,
+            )
 
         val map = habit.toMap()
 
@@ -28,12 +28,13 @@ class HabitTest {
     @Test
     fun `Habit from returns expected Habit object`() {
         val tagId = byteArrayOf(4, 5, 6)
-        val data = mapOf(
-            "user_id" to "user2",
-            "name" to "Read",
-            "created_at" to 987654321L,
-            "tag_id" to tagId
-        )
+        val data =
+            mapOf(
+                "user_id" to "user2",
+                "name" to "Read",
+                "created_at" to 987654321L,
+                "tag_id" to tagId,
+            )
 
         val habit = Habit.from("habit2", data)
 

@@ -37,6 +37,7 @@ private const val DAYS_IN_WEEK = 7
 @Composable
 fun CheckInHeatmap(
     checkIns: ImmutableList<CheckIn>,
+    modifier: Modifier = Modifier,
 ) {
     val config = LocalConfiguration.current
     val locale =
@@ -53,9 +54,10 @@ fun CheckInHeatmap(
     val offset = firstOfCurrentMonth.dayOfWeek.value - 1
 
     LazyVerticalGrid(
+        modifier = modifier,
         columns = GridCells.Fixed(DAYS_IN_WEEK),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         headerRow(locale = locale)
         repeat(offset) {
@@ -63,16 +65,18 @@ fun CheckInHeatmap(
         }
         items(monthDates) { date ->
             Box(
-                modifier = Modifier
-                    .aspectRatio(1f)
-                    .background(
-                        color = if (checkIns.any { it.completedDate.isEqual(date) }) {
-                            Color.Green
-                        } else {
-                            Color.DarkGray
-                        },
-                        shape = CircleShape
-                    )
+                modifier =
+                    Modifier
+                        .aspectRatio(1f)
+                        .background(
+                            color =
+                                if (checkIns.any { it.completedDate.isEqual(date) }) {
+                                    Color.Green
+                                } else {
+                                    Color.DarkGray
+                                },
+                            shape = CircleShape,
+                        ),
             ) {
                 Text(text = date.toString())
             }
@@ -80,15 +84,13 @@ fun CheckInHeatmap(
     }
 }
 
-private fun LazyGridScope.headerRow(
-    locale: Locale,
-) {
+private fun LazyGridScope.headerRow(locale: Locale) {
     DayOfWeek.entries.forEach {
         item {
             Text(
                 text = it.getDisplayName(TextStyle.NARROW_STANDALONE, locale),
                 modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
         }
     }
@@ -105,7 +107,7 @@ private fun CheckInHeatmapPreview() {
             }
         }
         CheckInHeatmap(
-            checkIns = previewCheckIns
+            checkIns = previewCheckIns,
         )
     }
 }
@@ -123,34 +125,33 @@ internal fun checkIn(
     nfcUid = null,
 )
 
-internal fun checkIn(
-    isoDate: String
-) = CheckIn(
-    id = isoDate,
-    habitId = "habit-id",
-    userId = "user-id",
-    completedDate = LocalDate.parse(isoDate),
-    nfcUid = null,
-)
-
-
-private val previewCheckIns = LocalDate.now().let {
-    persistentListOf(
-        checkIn(
-            id = "0",
-            completedDate = it.plusDays(1),
-        ),
-        checkIn(
-            id = "1",
-            completedDate = it.plusDays(3),
-        ),
-        checkIn(
-            id = "2",
-            completedDate = it.plusDays(7),
-        ),
-        checkIn(
-            id = "3",
-            completedDate = it.plusDays(14),
-        ),
+internal fun checkIn(isoDate: String) =
+    CheckIn(
+        id = isoDate,
+        habitId = "habit-id",
+        userId = "user-id",
+        completedDate = LocalDate.parse(isoDate),
+        nfcUid = null,
     )
-}
+
+private val previewCheckIns =
+    LocalDate.now().let {
+        persistentListOf(
+            checkIn(
+                id = "0",
+                completedDate = it.plusDays(1),
+            ),
+            checkIn(
+                id = "1",
+                completedDate = it.plusDays(3),
+            ),
+            checkIn(
+                id = "2",
+                completedDate = it.plusDays(7),
+            ),
+            checkIn(
+                id = "3",
+                completedDate = it.plusDays(14),
+            ),
+        )
+    }

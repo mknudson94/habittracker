@@ -28,7 +28,9 @@ data class HabitEntity(
         if (tagId != null) {
             if (other.tagId == null) return false
             if (!tagId.contentEquals(other.tagId)) return false
-        } else if (other.tagId != null) return false
+        } else if (other.tagId != null) {
+            return false
+        }
 
         return true
     }
@@ -43,18 +45,20 @@ data class HabitEntity(
     }
 }
 
-fun HabitEntity.asExternalModel() = Habit(
-    id = id,
-    userId = userId,
-    name = name,
-    createdAt = createdAt,
-    tagId = tagId,
-)
+fun HabitEntity.asExternalModel() =
+    Habit(
+        id = id,
+        userId = userId,
+        name = name,
+        createdAt = createdAt,
+        tagId = tagId,
+    )
 
-fun Habit.asEntity() = HabitEntity(
-    id = id,
-    userId = userId,
-    name = name,
-    createdAt = createdAt,
-    tagId = tagId,
-)
+fun Habit.asEntity() =
+    HabitEntity(
+        id = id,
+        userId = userId,
+        name = name,
+        createdAt = createdAt,
+        tagId = tagId,
+    )

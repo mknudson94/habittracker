@@ -53,7 +53,7 @@ fun AddHabitScreen(
             }
         },
         onDismiss = onDismiss,
-        onTagPaired = vm::onTagPaired,
+        onPairTag = vm::onTagPaired,
         isSaving = isSaving,
     )
 }
@@ -65,7 +65,7 @@ fun AddHabitScreen(
     nameTextFieldState: TextFieldState,
     onSaveHabit: () -> Unit,
     onDismiss: () -> Unit,
-    onTagPaired: (ByteArray) -> Unit,
+    onPairTag: (ByteArray) -> Unit,
     modifier: Modifier = Modifier,
     isSaving: Boolean = false,
 ) {
@@ -101,9 +101,10 @@ fun AddHabitScreen(
                 shape = RoundedCornerShape(16.dp),
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
@@ -112,12 +113,12 @@ fun AddHabitScreen(
                     )
                     Spacer(Modifier.width(12.dp))
                     Column(
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
                     ) {
                         Text("Link NFC tag (optional)")
                         Text(
                             text = "Use a physical tag as a trigger",
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
                         )
                     }
                     Icon(
@@ -133,7 +134,7 @@ fun AddHabitScreen(
             habitId = habitId,
             sheetState = nfcBottomSheetState,
             onDismiss = { showBottomSheet = false },
-            onTagPaired = onTagPaired,
+            onPairTag = onPairTag,
         )
     }
 }
@@ -146,6 +147,6 @@ private fun AddHabitScreenPreview() {
         nameTextFieldState = TextFieldState("Brush teeth"),
         onDismiss = {},
         onSaveHabit = {},
-        onTagPaired = {},
+        onPairTag = {},
     )
 }

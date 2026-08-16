@@ -27,10 +27,11 @@ private const val DAY_HEIGHT_DP = 16
 
 @Composable
 fun CheckInWeeklyCompletions(
-    checkInsByWeek: PersistentMap<Int, Int>
+    checkInsByWeek: PersistentMap<Int, Int>,
+    modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
     ) {
         Text("Weekly completions - last 12 weeks")
 //        Row(
@@ -58,7 +59,7 @@ fun CheckInWeeklyCompletions(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .height((DAY_HEIGHT_DP * 8).dp)
+                    .height((DAY_HEIGHT_DP * 8).dp),
         ) {
             val width = size.width / 12
             val margin = size.width / 48
@@ -69,36 +70,40 @@ fun CheckInWeeklyCompletions(
                     val barHeight = (it * DAY_HEIGHT_DP).dp.toPx()
                     drawRoundRect(
                         color = color,
-                        topLeft = Offset(
-                            x = x + margin,
-                            y = size.height - barHeight
-                        ),
-                        size = Size(
-                            width = width - (margin * 2),
-                            height = barHeight,
-                        ),
-                        cornerRadius = CornerRadius(4.dp.toPx())
+                        topLeft =
+                            Offset(
+                                x = x + margin,
+                                y = size.height - barHeight,
+                            ),
+                        size =
+                            Size(
+                                width = width - (margin * 2),
+                                height = barHeight,
+                            ),
+                        cornerRadius = CornerRadius(4.dp.toPx()),
                     )
                 } ?: this.drawOval(
                     color = color,
                     topLeft = Offset(x + margin, size.height - 3),
-                    size = Size(width - (margin * 2), 4f)
+                    size = Size(width - (margin * 2), 4f),
                 )
                 x += width
             }
         }
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 4.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             val currentWeek = LocalDate.now().get(WeekFields.ISO.weekOfWeekBasedYear())
             for (weekNumber in (currentWeek - 12)..currentWeek step 4) {
                 Text(
-                    text = firstDayOfWeek(weekNumber)
-                        .format(DateTimeFormatter.ofPattern("MMM dd")),
-                    style = MaterialTheme.typography.labelSmall
+                    text =
+                        firstDayOfWeek(weekNumber)
+                            .format(DateTimeFormatter.ofPattern("MMM dd")),
+                    style = MaterialTheme.typography.labelSmall,
                 )
             }
         }
@@ -109,29 +114,30 @@ fun CheckInWeeklyCompletions(
 @Composable
 private fun CheckInWeeklyCompletionsPreview() {
     CheckInWeeklyCompletions(
-        checkInsByWeek = previewCheckInsByWeek
+        checkInsByWeek = previewCheckInsByWeek,
     )
 }
 
-val previewCheckInsByWeek = persistentMapOf(
-    20 to 7,
-    22 to 4,
-    23 to 1,
-    24 to 7,
-    25 to 5,
-    27 to 7,
-    28 to 5,
-    29 to 2,
-    30 to 7,
-    31 to 4,
-)
-
+val previewCheckInsByWeek =
+    persistentMapOf(
+        20 to 7,
+        22 to 4,
+        23 to 1,
+        24 to 7,
+        25 to 5,
+        27 to 7,
+        28 to 5,
+        29 to 2,
+        30 to 7,
+        31 to 4,
+    )
 
 fun firstDayOfWeek(weekNumber: Int): LocalDate {
     val weekFields = WeekFields.ISO // Monday is the first day of the week
     val currentYear = Year.now().value
 
-    return LocalDate.of(currentYear, 1, 4) // Jan 4th is always in ISO week 1
+    return LocalDate
+        .of(currentYear, 1, 4) // Jan 4th is always in ISO week 1
         .with(weekFields.weekOfYear(), weekNumber.toLong())
         .with(weekFields.dayOfWeek(), 1L)
 }

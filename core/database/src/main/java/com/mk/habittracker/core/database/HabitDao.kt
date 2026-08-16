@@ -12,9 +12,13 @@ interface HabitDao {
     suspend fun addHabit(habit: HabitEntity)
 
     @Query(
-        "UPDATE habit SET tag_id = :tagId WHERE user_id = :userId AND id = :habitId"
+        "UPDATE habit SET tag_id = :tagId WHERE user_id = :userId AND id = :habitId",
     )
-    suspend fun updateHabitTagId(userId: String, habitId: String, tagId: ByteArray)
+    suspend fun updateHabitTagId(
+        userId: String,
+        habitId: String,
+        tagId: ByteArray,
+    )
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addHabits(habits: List<HabitEntity>)
@@ -22,7 +26,7 @@ interface HabitDao {
     @Query(
         "SELECT * FROM habit " +
             "WHERE :userId = habit.user_id " +
-            "ORDER BY habit.name DESC"
+            "ORDER BY habit.name DESC",
     )
     fun getHabits(userId: String): Flow<List<HabitEntity>>
 
@@ -42,7 +46,10 @@ interface HabitDao {
             "AND :userId = check_in.user_id " +
             "ORDER BY julianday(check_in.completed_date) DESC",
     )
-    fun getCheckIns(habitId: String, userId: String): Flow<List<CheckInEntity>>
+    fun getCheckIns(
+        habitId: String,
+        userId: String,
+    ): Flow<List<CheckInEntity>>
 
     @Query(
         "SELECT * FROM check_in " +
@@ -50,7 +57,10 @@ interface HabitDao {
             "AND :userId = check_in.user_id " +
             "AND date('now') = date(check_in.completed_date)",
     )
-    suspend fun getCheckInForToday(userId: String, habitId: String): CheckInEntity?
+    suspend fun getCheckInForToday(
+        userId: String,
+        habitId: String,
+    ): CheckInEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addCheckIn(checkIn: CheckInEntity)
@@ -68,6 +78,7 @@ interface HabitDao {
         date: String,
     )
 
+    @Suppress("ktlint:standard:max-line-length")
     @Query(
         "WITH " +
             "deduped AS (SELECT DISTINCT completed_date FROM check_in WHERE habit_id = :habitId), " +
@@ -77,7 +88,7 @@ interface HabitDao {
             "streak_groups AS (SELECT MAX(completed_date) AS lastDate, COUNT(*) AS streakLength " +
             "FROM dated_rows GROUP BY island) " +
             "SELECT lastDate, streakLength FROM streak_groups " +
-            "WHERE lastDate = (SELECT MAX(lastDate) FROM streak_groups)"
+            "WHERE lastDate = (SELECT MAX(lastDate) FROM streak_groups)",
     )
     suspend fun getLatestStreak(habitId: String): StreakEntity?
 }

@@ -43,7 +43,7 @@ class MainScreenViewModel
                     initialValue = persistentListOf(),
                 )
 
-    fun getCheckIns(habitId: String): StateFlow<List<CheckIn>> =
+        fun getCheckIns(habitId: String): StateFlow<List<CheckIn>> =
             repository
                 .getCheckIns(habitId, userId)
                 .stateIn(

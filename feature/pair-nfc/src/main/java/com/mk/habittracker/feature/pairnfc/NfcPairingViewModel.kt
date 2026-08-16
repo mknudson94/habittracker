@@ -29,7 +29,9 @@ sealed class PairNfcTagState {
         val message: String,
     ) : PairNfcTagState()
 
-    data class Success(val tagId: ByteArray) : PairNfcTagState() {
+    data class Success(
+        val tagId: ByteArray,
+    ) : PairNfcTagState() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
@@ -37,98 +39,100 @@ sealed class PairNfcTagState {
             return tagId.contentEquals(other.tagId)
         }
 
-        override fun hashCode(): Int {
-            return tagId.contentHashCode()
-        }
+        override fun hashCode(): Int = tagId.contentHashCode()
     }
 }
 
 @HiltViewModel(assistedFactory = NfcPairingViewModel.Factory::class)
-class NfcPairingViewModel @AssistedInject constructor(
-    @Assisted private val habitId: String,
-    private val tagBus: TagBus,
-    private val writeNfcTagUseCase: WriteNfcTagUseCase,
-    private val nfcReaderModeFlag: NfcReaderModeFlag,
-) : ViewModel() {
-    @AssistedFactory
-    interface Factory {
-        fun create(habitId: String): NfcPairingViewModel
-    }
+class NfcPairingViewModel
+    @AssistedInject
+    constructor(
+        @Assisted private val habitId: String,
+        private val tagBus: TagBus,
+        private val writeNfcTagUseCase: WriteNfcTagUseCase,
+        private val nfcReaderModeFlag: NfcReaderModeFlag,
+    ) : ViewModel() {
+        @AssistedFactory
+        interface Factory {
+            fun create(habitId: String): NfcPairingViewModel
+        }
 
-    private val _pairingState = MutableStateFlow<PairNfcTagState>(PairNfcTagState.ReadyToScan)
-    val pairingState = _pairingState.asStateFlow()
+        private val _pairingState = MutableStateFlow<PairNfcTagState>(PairNfcTagState.ReadyToScan)
+        val pairingState = _pairingState.asStateFlow()
 
-    private var writeNfcTagJob: Job? = null
+        private var writeNfcTagJob: Job? = null
 
-    private fun startWriteNfcTagJob() {
-        if (writeNfcTagJob?.isActive == true) return
-        nfcReaderModeFlag.requestReaderMode()
-        writeNfcTagJob =
-            tagBus.tags
-                .onEach { tag ->
-                    Log.d("nfc", "[NfcPairingViewModel#tags.onEach] received tag from bus")
-                    val result =
-                        writeNfcTagUseCase.execute(
-                            tag = tag,
-                            habitId = habitId,
-                            shouldOverwrite =
-                                (_pairingState.value as? PairNfcTagState.ConfirmOverwrite)?.confirmed == true,
+        private fun startWriteNfcTagJob() {
+            if (writeNfcTagJob?.isActive == true) return
+            nfcReaderModeFlag.requestReaderMode()
+            writeNfcTagJob =
+                tagBus.tags
+                    .onEach { tag ->
+                        Log.d("nfc", "[NfcPairingViewModel#tags.onEach] received tag from bus")
+                        val result =
+                            writeNfcTagUseCase.execute(
+                                tag = tag,
+                                habitId = habitId,
+                                shouldOverwrite =
+                                    (_pairingState.value as? PairNfcTagState.ConfirmOverwrite)
+                                        ?.confirmed == true,
+                            )
+                        _pairingState.value =
+                            when (result) {
+                                is WriteNfcResult.Success -> PairNfcTagState.Success(result.tagId)
+                                WriteNfcResult.DidNotOverwrite -> PairNfcTagState.ConfirmOverwrite()
+                                is WriteNfcResult.Error -> PairNfcTagState.Error(result.message)
+                            }
+                    }.onCompletion {
+                        Log.d(
+                            "nfc",
+                            "[NfcPairingViewModel#tags.onCompletion] cleaning up; cause = $it",
                         )
-                    _pairingState.value =
-                        when (result) {
-                            is WriteNfcResult.Success -> PairNfcTagState.Success(result.tagId)
-                            WriteNfcResult.DidNotOverwrite -> PairNfcTagState.ConfirmOverwrite()
-                            is WriteNfcResult.Error -> PairNfcTagState.Error(result.message)
-                        }
-                }
-                .onCompletion {
-                    Log.d("nfc", "[NfcPairingViewModel#tags.onCompletion] cleaning up; cause = $it")
-                    nfcReaderModeFlag.releaseReaderMode()
-                }
-                .launchIn(viewModelScope)
-    }
+                        nfcReaderModeFlag.releaseReaderMode()
+                    }.launchIn(viewModelScope)
+        }
 
-    init {
-        Log.d("nfc", "[NfcPairingViewModel#init]")
-        _pairingState
-            .onEach {
-                when (it) {
-                    PairNfcTagState.ReadyToScan -> {
-                        Log.d("nfc", "[NfcPairingViewModel#init] starting write job")
-                        startWriteNfcTagJob()
-                    }
-
-                    is PairNfcTagState.ConfirmOverwrite -> {
-                        if (it.confirmed) {
-                            Log.d("nfc", "[NfcPairingViewModel#init] starting re-write job")
-                            nfcReaderModeFlag.requestReaderMode()
+        init {
+            Log.d("nfc", "[NfcPairingViewModel#init]")
+            _pairingState
+                .onEach {
+                    when (it) {
+                        PairNfcTagState.ReadyToScan -> {
+                            Log.d("nfc", "[NfcPairingViewModel#init] starting write job")
                             startWriteNfcTagJob()
-                        } else {
+                        }
+
+                        is PairNfcTagState.ConfirmOverwrite -> {
+                            if (it.confirmed) {
+                                Log.d("nfc", "[NfcPairingViewModel#init] starting re-write job")
+                                nfcReaderModeFlag.requestReaderMode()
+                                startWriteNfcTagJob()
+                            } else {
+                                Log.d("nfc", "[NfcPairingViewModel#init] canceling write job")
+                                writeNfcTagJob?.cancel()
+                            }
+                        }
+
+                        is PairNfcTagState.Error, is PairNfcTagState.Success -> {
                             Log.d("nfc", "[NfcPairingViewModel#init] canceling write job")
+                            nfcReaderModeFlag.releaseReaderMode()
                             writeNfcTagJob?.cancel()
                         }
                     }
+                }.launchIn(viewModelScope)
+        }
 
-                    is PairNfcTagState.Error, is PairNfcTagState.Success -> {
-                        Log.d("nfc", "[NfcPairingViewModel#init] canceling write job")
-                        nfcReaderModeFlag.releaseReaderMode()
-                        writeNfcTagJob?.cancel()
-                    }
-                }
-            }.launchIn(viewModelScope)
-    }
+        override fun onCleared() {
+            nfcReaderModeFlag.releaseReaderMode()
+        }
 
-    override fun onCleared() {
-        nfcReaderModeFlag.releaseReaderMode()
-    }
+        fun confirmOverwrite() {
+            require(_pairingState.value is PairNfcTagState.ConfirmOverwrite)
+            _pairingState.value =
+                (_pairingState.value as PairNfcTagState.ConfirmOverwrite).copy(confirmed = true)
+        }
 
-    fun confirmOverwrite() {
-        require(_pairingState.value is PairNfcTagState.ConfirmOverwrite)
-        _pairingState.value =
-            (_pairingState.value as PairNfcTagState.ConfirmOverwrite).copy(confirmed = true)
+        fun tryAgain() {
+            _pairingState.value = PairNfcTagState.ReadyToScan
+        }
     }
-
-    fun tryAgain() {
-        _pairingState.value = PairNfcTagState.ReadyToScan
-    }
-}
