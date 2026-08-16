@@ -26,8 +26,9 @@ affectedModuleDetector {
         "settings.gradle.kts",
         "gradle/",
         "gradlew",
-        "buildSrc/",
-        "gradle/libs.versions.toml"
+        "gradle.properties",
+        "gradle/libs.versions.toml",
+        ".editorconfig"
     )
     ignoredFiles = setOf(".*\\.md", ".*\\.txt", ".*README")
 }

@@ -14,16 +14,18 @@ data class UserEntity(
     @ColumnInfo(name = "user_timezone") val userTimezone: ZoneId,
 )
 
-fun UserEntity.asExternalModel() = User(
-    id = id,
-    email = email,
-    createdAt = createdAt,
-    userTimezone = userTimezone
-)
+fun UserEntity.asExternalModel() =
+    User(
+        id = id,
+        email = email,
+        createdAt = createdAt,
+        userTimezone = userTimezone,
+    )
 
-fun User.asEntity() = UserEntity(
-    id = id,
-    email = email,
-    createdAt = createdAt,
-    userTimezone = userTimezone
-)
+fun User.asEntity() =
+    UserEntity(
+        id = id,
+        email = email,
+        createdAt = createdAt,
+        userTimezone = userTimezone,
+    )

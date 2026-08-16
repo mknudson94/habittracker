@@ -6,35 +6,39 @@ import android.nfc.Tag
 import android.nfc.tech.Ndef
 import javax.inject.Inject
 
-class WriteNfcTagUseCase @Inject constructor() {
-    fun execute(
-        tag: Tag,
-        habitId: String,
-        shouldOverwrite: Boolean,
-    ): WriteNfcResult {
-        val ndef = Ndef.get(tag)
-        return try {
-            if (ndef == null) error("Tag doesn't support NDEF")
-            ndef.connect()
+class WriteNfcTagUseCase
+    @Inject
+    constructor() {
+        fun execute(
+            tag: Tag,
+            habitId: String,
+            shouldOverwrite: Boolean,
+        ): WriteNfcResult {
+            val ndef = Ndef.get(tag)
+            return try {
+                if (ndef == null) error("Tag doesn't support NDEF")
+                ndef.connect()
 
-            if (!ndef.isWritable) error("This tag is read-only")
+                if (!ndef.isWritable) error("This tag is read-only")
 
-            if (!ndef.isBlank() && !shouldOverwrite) {
-                WriteNfcResult.DidNotOverwrite
-            } else {
-                ndef.writeNdefMessage(buildMessage(habitId))
-                WriteNfcResult.Success(tag.id)
+                if (!ndef.isBlank() && !shouldOverwrite) {
+                    WriteNfcResult.DidNotOverwrite
+                } else {
+                    ndef.writeNdefMessage(buildMessage(habitId))
+                    WriteNfcResult.Success(tag.id)
+                }
+            } catch (e: Exception) {
+                WriteNfcResult.Error(e.localizedMessage.orEmpty())
+            } finally {
+                if (ndef != null) ndef.close()
             }
-        } catch (e: Exception) {
-            WriteNfcResult.Error(e.localizedMessage.orEmpty())
-        } finally {
-            if (ndef != null) ndef.close()
         }
     }
-}
 
 sealed class WriteNfcResult {
-    data class Success(val tagId: ByteArray) : WriteNfcResult() {
+    data class Success(
+        val tagId: ByteArray,
+    ) : WriteNfcResult() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
@@ -42,9 +46,7 @@ sealed class WriteNfcResult {
             return tagId.contentEquals(other.tagId)
         }
 
-        override fun hashCode(): Int {
-            return tagId.contentHashCode()
-        }
+        override fun hashCode(): Int = tagId.contentHashCode()
     }
 
     data object DidNotOverwrite : WriteNfcResult()

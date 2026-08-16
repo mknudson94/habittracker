@@ -7,16 +7,20 @@ data class Habit(
     val createdAt: Long,
     val tagId: ByteArray? = null,
 ) {
-    fun toMap(): Map<String, Any?> = mapOf(
-        "id" to id,
-        "user_id" to userId,
-        "name" to name,
-        "created_at" to createdAt,
-        "tag_id" to tagId,
-    )
+    fun toMap(): Map<String, Any?> =
+        mapOf(
+            "id" to id,
+            "user_id" to userId,
+            "name" to name,
+            "created_at" to createdAt,
+            "tag_id" to tagId,
+        )
 
     companion object {
-        fun from(id: String, data: Map<String, Any>?): Habit {
+        fun from(
+            id: String,
+            data: Map<String, Any>?,
+        ): Habit {
             data!!
             return Habit(
                 id = id,
@@ -41,7 +45,9 @@ data class Habit(
         if (tagId != null) {
             if (other.tagId == null) return false
             if (!tagId.contentEquals(other.tagId)) return false
-        } else if (other.tagId != null) return false
+        } else if (other.tagId != null) {
+            return false
+        }
 
         return true
     }

@@ -39,7 +39,7 @@ fun HabitButton(
             CircularProgressIndicator(
                 modifier = Modifier.size(18.dp),
                 strokeWidth = 2.dp,
-                color = LocalContentColor.current
+                color = LocalContentColor.current,
             )
         } else {
             iconPainter?.let {

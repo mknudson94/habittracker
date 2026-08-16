@@ -49,8 +49,7 @@ class AppModule {
                 context = context,
                 klass = AppDatabase::class.java,
                 name = "app_db",
-            )
-            .fallbackToDestructiveMigration(true)
+            ).fallbackToDestructiveMigration(true)
             .build()
 
     @Provides

@@ -6,7 +6,6 @@ import java.time.LocalDate
 import java.util.Locale
 
 class LocalDateUtilsTest {
-
     @Test
     fun `previousSevenDaysLabels returns correct labels for Monday in US locale`() {
         // Monday, May 19, 2025
@@ -22,7 +21,7 @@ class LocalDateUtilsTest {
         // i=4: today - 2 = Saturday
         // i=5: today - 1 = Sunday
         // i=6: today - 0 = Monday
-        
+
         assertThat(labels).hasLength(7)
         assertThat(labels).isEqualTo(arrayOf("T", "W", "T", "F", "S", "S", "M"))
     }
@@ -40,7 +39,7 @@ class LocalDateUtilsTest {
         // i=4: today - 2 = Friday
         // i=5: today - 1 = Saturday
         // i=6: today - 0 = Sunday
-        
+
         assertThat(labels).isEqualTo(arrayOf("M", "T", "W", "T", "F", "S", "S"))
     }
 }

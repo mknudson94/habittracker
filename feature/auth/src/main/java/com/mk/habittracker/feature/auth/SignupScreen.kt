@@ -63,19 +63,20 @@ fun SignupScreen(
         modifier = modifier,
     ) { paddingValues ->
         Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp),
+            modifier =
+                Modifier
+                    .padding(paddingValues)
+                    .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = "Create an account",
-                style = MaterialTheme.typography.headlineMedium
+                style = MaterialTheme.typography.headlineMedium,
             )
             Text(
                 text = "Start tracking your daily routines",
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
             )
             TextField(
                 modifier = Modifier.fillMaxWidth(),
@@ -93,7 +94,7 @@ fun SignupScreen(
                     scope.launch {
                         onSignup(email.text.toString(), password.text.toString())
                     }
-                }
+                },
             ) {
                 Text("Create account")
             }
@@ -107,30 +108,31 @@ fun SignupScreen(
             }
             Button(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = {}
+                onClick = {},
             ) {
                 Text("Continue with Google")
             }
-            val annotatedText = buildAnnotatedString {
-                append("Already have an account?  ")
+            val annotatedText =
+                buildAnnotatedString {
+                    append("Already have an account?  ")
 
-                pushLink(
-                    LinkAnnotation.Clickable(
-                        tag = "Sign in",
-                        linkInteractionListener = {
-                            onCancel()
-                        },
+                    pushLink(
+                        LinkAnnotation.Clickable(
+                            tag = "Sign in",
+                            linkInteractionListener = {
+                                onCancel()
+                            },
+                        ),
                     )
-                )
-                pushStyle(
-                    SpanStyle(
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                    pushStyle(
+                        SpanStyle(
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                        ),
                     )
-                )
-                append(text = "Sign in")
-            }
+                    append(text = "Sign in")
+                }
             Text(annotatedText)
         }
     }
@@ -150,21 +152,21 @@ private fun PasswordField(
         placeholder = { Text("••••••••") },
         trailingIcon = {
             IconButton(
-                onClick = { isRevealed = !isRevealed }
+                onClick = { isRevealed = !isRevealed },
             ) {
                 if (isRevealed) {
                     Icon(
                         painter = painterResource(R.drawable.eye_closed),
-                        contentDescription = "hide password"
+                        contentDescription = "hide password",
                     )
                 } else {
                     Icon(
                         painter = painterResource(R.drawable.eye),
-                        contentDescription = "reveal password"
+                        contentDescription = "reveal password",
                     )
                 }
             }
-        }
+        },
     )
 }
 
@@ -173,6 +175,6 @@ private fun PasswordField(
 private fun SignupScreenPreview() {
     SignupScreen(
         onCancel = {},
-        onSignup = {_, _ -> },
+        onSignup = { _, _ -> },
     )
 }

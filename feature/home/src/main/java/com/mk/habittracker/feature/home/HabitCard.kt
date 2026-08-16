@@ -72,9 +72,10 @@ internal fun HabitCard(
 
     ElevatedCard {
         Column(
-            modifier = Modifier
-                .clickable(onClick = onClick)
-                .padding(16.dp)
+            modifier =
+                Modifier
+                    .clickable(onClick = onClick)
+                    .padding(16.dp),
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -82,7 +83,7 @@ internal fun HabitCard(
                 Text(
                     modifier = Modifier.weight(1f),
                     text = habit.name,
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
                 )
                 Checkbox(
                     checked = checkIns.any { it.completedDate == LocalDate.now() },
@@ -104,17 +105,19 @@ internal fun HabitCard(
                     ) {
                         Text(dayLabel, style = MaterialTheme.typography.labelSmall)
                         Box(
-                            modifier = Modifier
-                                .padding(4.dp)
-                                .size(12.dp)
-                                .background(
-                                    color = if (checkIns.any { it.completedDate == day }) {
-                                        Color(0xff5cb85c)
-                                    } else {
-                                        MaterialTheme.colorScheme.surfaceDim
-                                    },
-                                    shape = CircleShape,
-                                )
+                            modifier =
+                                Modifier
+                                    .padding(4.dp)
+                                    .size(12.dp)
+                                    .background(
+                                        color =
+                                            if (checkIns.any { it.completedDate == day }) {
+                                                Color(0xff5cb85c)
+                                            } else {
+                                                MaterialTheme.colorScheme.surfaceDim
+                                            },
+                                        shape = CircleShape,
+                                    ),
                         )
                     }
                 }

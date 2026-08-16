@@ -11,7 +11,6 @@ import androidx.work.WorkManager
 import com.mk.habittracker.core.nfc.parseHabitTrackerNdef
 
 class NfcCheckInTrampolineActivity : ComponentActivity() {
-
     private val workManager by lazy { WorkManager.getInstance(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,15 +33,18 @@ class NfcCheckInTrampolineActivity : ComponentActivity() {
         Log.d("intent", "handling intent from trampoline: $intent")
 
         val ndef = intent.parseHabitTrackerNdef() ?: return // TODO: handle error here
-        val inputData = Data.Builder()
-            .putByteArray(NFC_UID_KEY, ndef.uid)
-            .putString(NFC_HABIT_ID_KEY, ndef.habitId)
-            .build()
+        val inputData =
+            Data
+                .Builder()
+                .putByteArray(NFC_UID_KEY, ndef.uid)
+                .putString(NFC_HABIT_ID_KEY, ndef.habitId)
+                .build()
 
-        val workRequest = OneTimeWorkRequestBuilder<NfcCheckInWorker>()
-            .setInputData(inputData)
-            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-            .build()
+        val workRequest =
+            OneTimeWorkRequestBuilder<NfcCheckInWorker>()
+                .setInputData(inputData)
+                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                .build()
 
         workManager.enqueue(workRequest)
     }

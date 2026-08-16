@@ -13,7 +13,9 @@ import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
 @HiltAndroidApp
-class HabitTrackerApp : Application(), Configuration.Provider {
+class HabitTrackerApp :
+    Application(),
+    Configuration.Provider {
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
 
@@ -22,25 +24,29 @@ class HabitTrackerApp : Application(), Configuration.Provider {
         createCheckInNotificationChannel(this)
     }
 
-    override fun getWorkManagerConfiguration(): Configuration {
-        return Configuration.Builder()
+    override fun getWorkManagerConfiguration(): Configuration =
+        Configuration
+            .Builder()
             .setWorkerFactory(workerFactory)
             .build()
-    }
 
     private fun createCheckInNotificationChannel(context: Context) {
         Log.d("HabitTrackerApp", "Creating notification channel")
         val name = context.getString(com.mk.habittracker.nfccheckin.R.string.channel_name)
         val descriptionText = context.getString(R.string.channel_description)
         val importance = NotificationManager.IMPORTANCE_HIGH
-        val channel = NotificationChannel(
-            /* id = */ CHANNEL_ID,
-            /* name = */ name,
-            /* importance = */ importance,
-        ).apply {
-            description = descriptionText
-            enableVibration(false) // your custom haptic already covers this
-        }
+        val channel =
+            NotificationChannel(
+                // id =
+                CHANNEL_ID,
+                // name =
+                name,
+                // importance =
+                importance,
+            ).apply {
+                description = descriptionText
+                enableVibration(false) // your custom haptic already covers this
+            }
         // Register the channel with the system.
         val notificationManager: NotificationManager =
             context.getSystemService(NotificationManager::class.java) as NotificationManager

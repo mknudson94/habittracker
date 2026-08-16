@@ -25,7 +25,6 @@ class HabitDetailViewModel
         private val repository: HabitRepository,
         private val habitDao: HabitDao,
     ) : ViewModel() {
-
         @AssistedFactory
         interface Factory {
             fun create(habitId: String): HabitDetailViewModel
@@ -44,11 +43,12 @@ class HabitDetailViewModel
                     initialValue = null,
                 )
 
-    val checkIns = repository.getCheckIns(habitId, userId).stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = emptyList(),
-    )
+        val checkIns =
+            repository.getCheckIns(habitId, userId).stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = emptyList(),
+            )
         val nCheckIns =
             repository.getCheckIns(habitId, userId).map { it.size.toString() }.stateIn(
                 scope = viewModelScope,

@@ -34,9 +34,10 @@ fun FullSheet(
         topBar = {
             TopAppBar(
                 title = { Text(title) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                ),
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    ),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
@@ -45,8 +46,9 @@ fun FullSheet(
                         )
                     }
                 },
-                modifier = Modifier
-                    .padding(start = 8.dp, end = 8.dp, bottom = 12.dp),
+                modifier =
+                    Modifier
+                        .padding(start = 8.dp, end = 8.dp, bottom = 12.dp),
             )
         },
     ) { paddingValues ->

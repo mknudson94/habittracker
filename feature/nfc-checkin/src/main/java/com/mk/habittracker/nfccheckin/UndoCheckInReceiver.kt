@@ -20,11 +20,13 @@ internal const val EXTRA_NOTIFICATION_ID = "extra_notification_id"
 
 @AndroidEntryPoint
 class UndoCheckInReceiver : BroadcastReceiver() {
-
     @Inject
     lateinit var repository: HabitRepository
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         if (intent.action != ACTION_UNDO_CHECKIN) return
 
         val habitId = intent.getStringExtra(EXTRA_HABIT_ID) ?: return
@@ -41,7 +43,7 @@ class UndoCheckInReceiver : BroadcastReceiver() {
             repository.deleteCheckIn(
                 habitId = habitId,
                 date = LocalDate.now(),
-                userId = userId
+                userId = userId,
             )
         }
     }

@@ -18,39 +18,41 @@ fun Intent.parseHabitTrackerNdef(): HabitTrackerNdef? {
         return null
     }
     val tagId = getByteArrayExtra(NfcAdapter.EXTRA_ID)
-    val messages: Array<NdefMessage>? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        getParcelableArrayExtra(
-            NfcAdapter.EXTRA_NDEF_MESSAGES,
-            NdefMessage::class.java,
-        )?.filterIsInstance<NdefMessage>()
-            ?.toTypedArray()
-    } else {
-        @Suppress("DEPRECATION")
-        getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
-            ?.filterIsInstance<NdefMessage>()
-            ?.toTypedArray()
-    }
+    val messages: Array<NdefMessage>? =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            getParcelableArrayExtra(
+                NfcAdapter.EXTRA_NDEF_MESSAGES,
+                NdefMessage::class.java,
+            )?.filterIsInstance<NdefMessage>()
+                ?.toTypedArray()
+        } else {
+            @Suppress("DEPRECATION")
+            getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
+                ?.filterIsInstance<NdefMessage>()
+                ?.toTypedArray()
+        }
     check(
         !messages.isNullOrEmpty() &&
             messages.size == 1 &&
-            messages.first().records.size == 2
+            messages.first().records.size == 2,
     ) { "error, bad ndef" }
     val records = messages.first().records
     val habitRecord = records.first()
     val habitId = habitRecord.payload.toString(Charsets.UTF_8)
     return HabitTrackerNdef(
         uid = tagId ?: byteArrayOf(),
-        habitId = habitId
+        habitId = habitId,
     )
 }
 
 fun Tag.parseHabitTrackerNdef(): HabitTrackerNdef {
     val ndef = Ndef.get(this) ?: error("null ndef")
     val message = ndef.cachedNdefMessage ?: ndef.ndefMessage ?: error("null message")
-    val habitId = message.records
-        .first()
-        .payload
-        .toString(Charsets.UTF_8)
+    val habitId =
+        message.records
+            .first()
+            .payload
+            .toString(Charsets.UTF_8)
     return HabitTrackerNdef(
         uid = this.id,
         habitId = habitId,
