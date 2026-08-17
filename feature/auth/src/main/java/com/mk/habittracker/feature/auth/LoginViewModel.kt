@@ -6,9 +6,8 @@ import android.widget.Toast
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.auth.auth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,9 +19,9 @@ import javax.inject.Inject
 class LoginViewModel
     @Inject
     constructor(
+        private val auth: FirebaseAuth,
         val googleSignInManager: GoogleSignInManager,
     ) : ViewModel() {
-        private val auth = Firebase.auth
         private var _authState = MutableStateFlow(auth.currentUser)
         val authState = _authState.asStateFlow()
 
@@ -36,13 +35,14 @@ class LoginViewModel
             email: String,
             password: String,
         ) {
-            auth
-                .signInWithEmailAndPassword(email, password)
-                .addOnSuccessListener {
-                    _authState.value = it.user
-                }.addOnFailureListener {
-                    Log.e("login", "failed to log in: $it")
+            viewModelScope.launch {
+                try {
+                    val result = auth.signInWithEmailAndPassword(email, password).await()
+                    _authState.value = result.user
+                } catch (e: Exception) {
+                    Log.e("login", "failed to log in: $e")
                 }
+            }
         }
 
         fun signInWithGoogle(activityContext: Context) {
@@ -64,14 +64,13 @@ class LoginViewModel
                             ).show()
                         return@launch
                     }
-                val firebaseCredential = GoogleAuthProvider.getCredential(googleIdToken, null)
-                auth
-                    .signInWithCredential(firebaseCredential)
-                    .addOnSuccessListener {
-                        _authState.value = it.user
-                    }.addOnFailureListener {
-                        Log.e("login", "failed to log in: $it")
-                    }
+                try {
+                    val firebaseCredential = GoogleAuthProvider.getCredential(googleIdToken, null)
+                    val result = auth.signInWithCredential(firebaseCredential).await()
+                    _authState.value = result.user
+                } catch (e: Exception) {
+                    Log.e("login", "failed to log in: $e")
+                }
             }
         }
 
