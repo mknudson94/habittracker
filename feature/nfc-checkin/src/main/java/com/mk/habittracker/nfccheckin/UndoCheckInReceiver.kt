@@ -4,8 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationManagerCompat
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
+import com.google.firebase.auth.FirebaseAuth
 import com.mk.habittracker.core.data.HabitRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -23,7 +22,18 @@ class UndoCheckInReceiver : BroadcastReceiver() {
     @Inject
     lateinit var repository: HabitRepository
 
+    @Inject
+    lateinit var auth: FirebaseAuth
+
     override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
+        // Logic moved to handleIntent to allow unit testing without Hilt injection
+        handleIntent(context, intent)
+    }
+
+    internal fun handleIntent(
         context: Context,
         intent: Intent,
     ) {
@@ -31,7 +41,7 @@ class UndoCheckInReceiver : BroadcastReceiver() {
 
         val habitId = intent.getStringExtra(EXTRA_HABIT_ID) ?: return
         val notificationId = intent.getIntExtra(EXTRA_NOTIFICATION_ID, -1)
-        val userId = Firebase.auth.currentUser?.uid ?: "anonymous"
+        val userId = auth.currentUser?.uid ?: "anonymous"
 
         // Cancel the notification immediately
         if (notificationId != -1) {
