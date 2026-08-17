@@ -2,13 +2,18 @@ package com.mk.habittracker.core.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Typography
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
@@ -311,6 +316,27 @@ val unspecified_scheme = ColorFamily(
     Color.Unspecified, Color.Unspecified, Color.Unspecified, Color.Unspecified
 )
 
+val LocalExtendedColorScheme = staticCompositionLocalOf {
+    extendedLight
+}
+
+object HabitTrackerTheme {
+    val colorScheme: ColorScheme
+        @Composable
+        @ReadOnlyComposable
+        get() = MaterialTheme.colorScheme
+
+    val typography: Typography
+        @Composable
+        @ReadOnlyComposable
+        get() = MaterialTheme.typography
+
+    val extendedColorScheme: ExtendedColorScheme
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalExtendedColorScheme.current
+}
+
 @Composable
 fun HabitTrackerTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -328,10 +354,19 @@ fun HabitTrackerTheme(
       else -> lightScheme
   }
 
-  MaterialTheme(
-    colorScheme = colorScheme,
-    typography = AppTypography,
-    content = content
-  )
+  val extendedColorScheme = when {
+      darkTheme -> extendedDark
+      else -> extendedLight
+  }
+
+  CompositionLocalProvider(
+      LocalExtendedColorScheme provides extendedColorScheme
+  ) {
+      MaterialTheme(
+          colorScheme = colorScheme,
+          typography = AppTypography,
+          content = content
+      )
+  }
 }
 

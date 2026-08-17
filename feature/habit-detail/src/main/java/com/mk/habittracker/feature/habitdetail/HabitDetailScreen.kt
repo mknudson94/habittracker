@@ -31,17 +31,29 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.jakewharton.threetenabp.AndroidThreeTen
 import com.mk.habittracker.core.model.CheckIn
+import com.mk.habittracker.core.model.Habit
+import com.mk.habittracker.core.model.HabitDetail
+import com.mk.habittracker.core.model.HabitStats
 import com.mk.habittracker.core.ui.FullSheet
 import com.mk.habittracker.feature.pairnfc.NfcPairingBottomSheet
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.collections.immutable.toPersistentMap
+import org.threeten.bp.Instant
+import org.threeten.bp.ZoneId
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.time.temporal.WeekFields
 
 @Composable
@@ -50,16 +62,13 @@ fun HabitDetailScreen(
     modifier: Modifier = Modifier,
     vm: HabitDetailViewModel = hiltViewModel(),
 ) {
-    val habit by vm.habit.collectAsStateWithLifecycle()
+    val habitDetail by vm.habitDetail.collectAsStateWithLifecycle()
     val checkIns by vm.checkIns.collectAsStateWithLifecycle()
-    val nCheckIns by vm.nCheckIns.collectAsStateWithLifecycle()
-    habit?.let {
+    habitDetail?.let {
         HabitDetailScreen(
             modifier = modifier,
-            habitId = vm.habitId,
-            title = it.name,
+            habitDetail = it,
             checkIns = checkIns.toPersistentList(),
-            nCheckIns = nCheckIns,
             onBack = onBack,
         )
     } ?: Text("error fetching habit with id ${vm.habitId}")
@@ -68,11 +77,9 @@ fun HabitDetailScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HabitDetailScreen(
-    habitId: String,
-    title: String,
+    habitDetail: HabitDetail,
     onBack: () -> Unit,
     checkIns: ImmutableList<CheckIn>,
-    nCheckIns: String,
     modifier: Modifier = Modifier,
 ) {
     val nfcBottomSheetState = rememberModalBottomSheetState()
@@ -80,7 +87,7 @@ fun HabitDetailScreen(
 
     FullSheet(
         modifier = modifier,
-        title = title,
+        title = habitDetail.habit.name,
         onBack = onBack,
     ) {
         Column(
@@ -90,7 +97,14 @@ fun HabitDetailScreen(
                     .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            OverviewSection(
+                currentStreak = habitDetail.stats.currentStreak,
+                bestStreak = habitDetail.stats.bestStreak,
+                totalCheckIns = habitDetail.stats.totalCheckIns,
+                createdAt = habitDetail.habit.createdAt,
+            )
             NfcSection(
+                isPaired = habitDetail.habit.tagId != null,
                 onClick = { showBottomSheet = true },
             )
             // HistorySection(nCheckIns = nCheckIns)
@@ -116,7 +130,7 @@ fun HabitDetailScreen(
     }
     if (showBottomSheet) {
         NfcPairingBottomSheet(
-            habitId = habitId,
+            habitId = habitDetail.habit.id,
             sheetState = nfcBottomSheetState,
             onDismiss = { showBottomSheet = false },
         )
@@ -124,7 +138,70 @@ fun HabitDetailScreen(
 }
 
 @Composable
-private fun NfcSection(onClick: () -> Unit) {
+private fun OverviewSection(
+    currentStreak: Int,
+    bestStreak: Int,
+    totalCheckIns: Int,
+    createdAt: Long,
+
+) {
+    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "CURRENT STREAK",
+                    style = MaterialTheme.typography.labelLarge
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = currentStreak.toString(),
+                        style = MaterialTheme.typography.displayLarge.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text("days", style = MaterialTheme.typography.titleMedium)
+                }
+            }
+            Spacer(Modifier.width(12.dp))
+            Row(modifier = Modifier.weight(1f)) {
+                Column {
+                    Text("BEST", style = MaterialTheme.typography.labelMedium)
+                    Text("TOTAL", style = MaterialTheme.typography.labelMedium)
+                    Text("CREATED", style = MaterialTheme.typography.labelMedium)
+                }
+                Spacer(Modifier.width(8.dp))
+                Column {
+                    Text(
+                        bestStreak.toString(),
+                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+                    )
+                    Text(
+                        totalCheckIns.toString(),
+                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+                    )
+                    // todo: date format
+                    val createdString =
+                        Instant.ofEpochMilli(createdAt).atZone(ZoneId.systemDefault())
+                            .format(org.threeten.bp.format.DateTimeFormatter.ofPattern("MMM dd"))
+                    Text(
+                        createdString,
+                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun NfcSection(
+    isPaired: Boolean,
+    onClick: () -> Unit
+) {
     ElevatedCard(
         modifier =
             Modifier
@@ -139,15 +216,54 @@ private fun NfcSection(onClick: () -> Unit) {
                 text = "PHYSICAL TRIGGER",
                 style = MaterialTheme.typography.labelLarge,
             )
-            Row(
-                modifier = Modifier.height(IntrinsicSize.Min),
-            ) {
-                Box(
-                    modifier =
-                        Modifier
-                            .fillMaxHeight()
-                            .aspectRatio(1f)
-                            .drawBehind {
+            if (isPaired) {
+                NfcBodyPaired()
+            } else {
+                NfcBodyNotPaired()
+            }
+        }
+    }
+}
+
+@Composable
+private fun NfcBodyPaired() {
+    Row(
+        modifier = Modifier.height(IntrinsicSize.Min),
+    ) {
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxHeight()
+                    .aspectRatio(1f),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.outline_check_circle_24),
+                contentDescription = "",
+            )
+        }
+        Spacer(Modifier.width(12.dp))
+        Column {
+            Text(
+                text = "NFC tag paired",
+                style = MaterialTheme.typography.labelLarge,
+            )
+        }
+    }
+
+}
+
+@Composable
+private fun NfcBodyNotPaired() {
+    Row(
+        modifier = Modifier.height(IntrinsicSize.Min),
+    ) {
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxHeight()
+                    .aspectRatio(1f)
+                    .drawBehind {
                                 drawCircle(
                                     color = Color.Black,
                                     alpha = .7f,
@@ -162,26 +278,24 @@ private fun NfcSection(onClick: () -> Unit) {
                                         ),
                                 )
                             },
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.outline_add_link_24),
-                        contentDescription = "add nfc tag",
-                    )
-                }
-                Spacer(Modifier.width(12.dp))
-                Column {
-                    Text(
-                        text = "Add NFC tag",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.primary,
-                    )
-                    Text(
-                        text = "Tap to pair a physical object",
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                }
-            }
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.outline_add_link_24),
+                contentDescription = "add nfc tag",
+            )
+        }
+        Spacer(Modifier.width(12.dp))
+        Column {
+            Text(
+                text = "Add NFC tag",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            Text(
+                text = "Tap to pair a physical object",
+                style = MaterialTheme.typography.bodySmall,
+            )
         }
     }
 }
@@ -204,13 +318,34 @@ private fun HistorySection(nCheckIns: String) {
 
 @Composable
 @Preview(showBackground = true)
-private fun HabitDetailScreenPreview() {
+private fun HabitDetailScreenPreview(
+    @PreviewParameter(IsPairedProvider::class) isPaired: Boolean,
+) {
+    AndroidThreeTen.init(LocalContext.current)
     HabitDetailScreen(
-        habitId = "",
-        title = "Drink 8 glasses of water",
+        habitDetail = HabitDetail(
+            habit = Habit(
+                id = "",
+                userId = "",
+                name = "Drink 8 glasses of water",
+                createdAt = 1778557600000L,
+                tagId = if (isPaired) byteArrayOf(1, 2, 3) else null,
+            ),
+            HabitStats(
+                currentStreak = 12,
+                bestStreak = 19,
+                totalCheckIns = 59,
+            )
+        ),
         checkIns = previewCheckIns.toPersistentList(),
-        nCheckIns = "2",
         onBack = {},
+    )
+}
+
+class IsPairedProvider: PreviewParameterProvider<Boolean> {
+    override val values: Sequence<Boolean> = sequenceOf(
+        true,
+        false
     )
 }
 
