@@ -13,8 +13,7 @@ import androidx.core.net.toUri
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
+import com.google.firebase.auth.FirebaseAuth
 import com.mk.habittracker.core.data.HabitRepository
 import com.mk.habittracker.core.nfc.HabitTrackerNdef
 import com.mk.habittracker.core.nfc.NfcCheckInHandler
@@ -37,8 +36,8 @@ class NfcCheckInWorker
         @Assisted workerParams: WorkerParameters,
         private val nfcCheckInHandler: NfcCheckInHandler,
         private val habitRepository: HabitRepository,
+        private val auth: FirebaseAuth,
     ) : CoroutineWorker(appContext, workerParams) {
-        val auth = Firebase.auth
 
         override suspend fun doWork(): Result {
             val tagId = this.inputData.getByteArray(NFC_UID_KEY)
