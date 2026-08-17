@@ -47,4 +47,11 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.hilt.android)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.truth)
+    testImplementation(libs.turbine)
+    testImplementation(libs.robolectric)
 }

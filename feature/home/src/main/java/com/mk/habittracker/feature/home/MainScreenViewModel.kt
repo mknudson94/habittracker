@@ -2,8 +2,7 @@ package com.mk.habittracker.feature.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
+import com.google.firebase.auth.FirebaseAuth
 import com.mk.habittracker.core.data.HabitRepository
 import com.mk.habittracker.core.model.CheckIn
 import com.mk.habittracker.core.model.Habit
@@ -29,9 +28,10 @@ class MainScreenViewModel
     @Inject
     constructor(
         private val repository: HabitRepository,
+        private val auth: FirebaseAuth,
     ) : ViewModel() {
         private val userId: String
-            get() = Firebase.auth.currentUser?.uid ?: "anonymous"
+            get() = auth.currentUser?.uid ?: "anonymous"
 
         val habits: StateFlow<ImmutableList<Habit>> =
             repository
