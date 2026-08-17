@@ -5,8 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
+import com.google.firebase.auth.FirebaseAuth
 import com.mk.habittracker.core.data.HabitRepository
 import com.mk.habittracker.core.model.Habit
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,6 +19,7 @@ class AddHabitViewModel
     @Inject
     constructor(
         private val repository: HabitRepository,
+        private val auth: FirebaseAuth,
     ) : ViewModel() {
         val habitId = Uuid.random().toString()
         val name = TextFieldState()
@@ -27,7 +27,7 @@ class AddHabitViewModel
             private set
 
         private val userId: String
-            get() = Firebase.auth.currentUser?.uid ?: "anonymous"
+            get() = auth.currentUser?.uid ?: "anonymous"
 
         fun onTagPaired(id: ByteArray) {
             tagId = id
