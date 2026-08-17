@@ -9,7 +9,7 @@ import com.mk.habittracker.core.database.asExternalModel
 import com.mk.habittracker.core.model.CheckIn
 import com.mk.habittracker.core.model.Habit
 import com.mk.habittracker.core.model.HabitDetail
-import com.mk.habittracker.core.model.HabitStats
+import com.mk.habittracker.core.model.computeStats
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -178,38 +177,5 @@ class HabitRepository @Inject constructor(
                 stats = checkIns.computeStats(),
             )
         }
-    }
-
-    private fun List<CheckIn>.computeStats(): HabitStats {
-        val datesDesc = this
-            .map { it.completedDate }
-            .sortedDescending()
-
-        if (datesDesc.isEmpty()) return HabitStats(0, 0, 0)
-
-        val today = LocalDate.now()
-        var currentStreak = 0
-        // grace until EOD
-        if (ChronoUnit.DAYS.between(datesDesc.first(), today) <= 1) {
-            currentStreak = 1
-            var i = 1
-            while (i < datesDesc.size &&
-                ChronoUnit.DAYS.between(datesDesc[i], datesDesc[0]) == i.toLong()) {
-                currentStreak++; i++
-            }
-        }
-
-        var running = 1
-        var best = 1
-        for (j in 1 until datesDesc.size) {
-            running = if (ChronoUnit.DAYS.between(datesDesc[j], datesDesc[j - 1]) == 1L) {
-                running + 1
-            } else {
-                1
-            }
-            best = maxOf(best, running)
-        }
-
-        return HabitStats(currentStreak, best, datesDesc.size)
     }
 }

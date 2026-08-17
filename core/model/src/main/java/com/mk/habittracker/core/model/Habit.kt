@@ -1,5 +1,8 @@
 package com.mk.habittracker.core.model
 
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
+
 data class Habit(
     val id: String,
     val userId: String,
@@ -72,3 +75,37 @@ data class HabitDetail(
     val habit: Habit,
     val stats: HabitStats,
 )
+
+fun List<CheckIn>.computeStats(): HabitStats {
+    val datesDesc = this
+        .map { it.completedDate }
+        .sortedDescending()
+
+    if (datesDesc.isEmpty()) return HabitStats(0, 0, 0)
+
+    val today = LocalDate.now()
+    var currentStreak = 0
+    // grace until EOD
+    if (ChronoUnit.DAYS.between(datesDesc.first(), today) <= 1) {
+        currentStreak = 1
+        var i = 1
+        while (i < datesDesc.size &&
+            ChronoUnit.DAYS.between(datesDesc[i], datesDesc[0]) == i.toLong()
+        ) {
+            currentStreak++; i++
+        }
+    }
+
+    var running = 1
+    var best = 1
+    for (j in 1 until datesDesc.size) {
+        running = if (ChronoUnit.DAYS.between(datesDesc[j], datesDesc[j - 1]) == 1L) {
+            running + 1
+        } else {
+            1
+        }
+        best = maxOf(best, running)
+    }
+
+    return HabitStats(currentStreak, best, datesDesc.size)
+}
