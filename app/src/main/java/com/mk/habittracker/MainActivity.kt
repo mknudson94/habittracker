@@ -62,7 +62,7 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            HabitTrackerTheme {
+            HabitTrackerTheme(dynamicColor = false) {
                 AppNavigation()
             }
         }
