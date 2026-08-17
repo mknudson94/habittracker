@@ -61,3 +61,14 @@ data class Habit(
         return result
     }
 }
+
+data class HabitStats(
+    val currentStreak: Int,
+    val bestStreak: Int,
+    val totalCheckIns: Int,
+)
+
+data class HabitDetail(
+    val habit: Habit,
+    val stats: HabitStats,
+)

@@ -45,7 +45,7 @@ class MainScreenViewModel
 
         fun getCheckIns(habitId: String): StateFlow<List<CheckIn>> =
             repository
-                .getCheckIns(habitId, userId)
+                .getCheckIns(userId, habitId)
                 .stateIn(
                     scope = viewModelScope,
                     started = SharingStarted.WhileSubscribed(DEFAULT_STOP_TIMEOUT_MILLIS),
