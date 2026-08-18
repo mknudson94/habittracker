@@ -1,15 +1,14 @@
 package com.mk.habittracker.feature.auth
 
+import android.util.Base64
 import com.google.common.truth.Truth.assertThat
+import org.json.JSONObject
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import android.util.Base64
-import org.json.JSONObject
 
 @RunWith(RobolectricTestRunner::class)
 class GoogleSignInManagerTest {
-
     @Test
     fun `generateSecureRandomNonce returns non-empty string`() {
         val nonce = generateSecureRandomNonce()
@@ -29,7 +28,7 @@ class GoogleSignInManagerTest {
         val header = Base64.encodeToString("{}".toByteArray(), Base64.NO_WRAP)
         val payload = Base64.encodeToString(
             JSONObject().put("nonce", nonce).toString().toByteArray(),
-            Base64.NO_WRAP
+            Base64.NO_WRAP,
         )
         val idToken = "$header.$payload.signature"
 

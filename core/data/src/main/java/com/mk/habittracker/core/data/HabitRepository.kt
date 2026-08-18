@@ -170,7 +170,7 @@ class HabitRepository @Inject constructor(
         val userId = auth.uid.orEmpty()
         return combine(
             getHabit(userId, habitId),
-            getCheckIns(userId, habitId)
+            getCheckIns(userId, habitId),
         ) { habit, checkIns ->
             HabitDetail(
                 habit = habit ?: error("null habit"),

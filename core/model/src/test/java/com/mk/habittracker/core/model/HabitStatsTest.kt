@@ -5,12 +5,11 @@ import org.junit.Test
 import java.time.LocalDate
 
 class HabitStatsTest {
-
     @Test
     fun `computeStats returns empty stats for empty check-ins`() {
         val checkIns = emptyList<CheckIn>()
         val stats = checkIns.computeStats()
-        
+
         assertThat(stats.currentStreak).isEqualTo(0)
         assertThat(stats.bestStreak).isEqualTo(0)
         assertThat(stats.totalCheckIns).isEqualTo(0)
@@ -22,11 +21,11 @@ class HabitStatsTest {
         val checkIns = listOf(
             checkIn(today),
             checkIn(today.minusDays(1)),
-            checkIn(today.minusDays(2))
+            checkIn(today.minusDays(2)),
         )
-        
+
         val stats = checkIns.computeStats()
-        
+
         assertThat(stats.currentStreak).isEqualTo(3)
         assertThat(stats.bestStreak).isEqualTo(3)
         assertThat(stats.totalCheckIns).isEqualTo(3)
@@ -39,11 +38,11 @@ class HabitStatsTest {
             checkIn(today),
             checkIn(today.minusDays(1)),
             // Gap at today.minusDays(2)
-            checkIn(today.minusDays(3))
+            checkIn(today.minusDays(3)),
         )
-        
+
         val stats = checkIns.computeStats()
-        
+
         assertThat(stats.currentStreak).isEqualTo(2)
         assertThat(stats.bestStreak).isEqualTo(2)
         assertThat(stats.totalCheckIns).isEqualTo(3)
@@ -53,17 +52,19 @@ class HabitStatsTest {
     fun `computeStats calculates best streak correctly`() {
         val today = LocalDate.now()
         val checkIns = listOf(
+            // Current streak 2
             checkIn(today),
-            checkIn(today.minusDays(1)), // Current streak 2
+            checkIn(today.minusDays(1)),
             // Gap
+            // Best streak 4
             checkIn(today.minusDays(4)),
             checkIn(today.minusDays(5)),
             checkIn(today.minusDays(6)),
-            checkIn(today.minusDays(7))  // Best streak 4
+            checkIn(today.minusDays(7)),
         )
-        
+
         val stats = checkIns.computeStats()
-        
+
         assertThat(stats.currentStreak).isEqualTo(2)
         assertThat(stats.bestStreak).isEqualTo(4)
     }
@@ -73,11 +74,11 @@ class HabitStatsTest {
         val today = LocalDate.now()
         val checkIns = listOf(
             checkIn(today.minusDays(1)),
-            checkIn(today.minusDays(2))
+            checkIn(today.minusDays(2)),
         )
-        
+
         val stats = checkIns.computeStats()
-        
+
         assertThat(stats.currentStreak).isEqualTo(2)
     }
 
@@ -86,11 +87,11 @@ class HabitStatsTest {
         val today = LocalDate.now()
         val checkIns = listOf(
             checkIn(today.minusDays(2)),
-            checkIn(today.minusDays(3))
+            checkIn(today.minusDays(3)),
         )
-        
+
         val stats = checkIns.computeStats()
-        
+
         assertThat(stats.currentStreak).isEqualTo(0)
         assertThat(stats.bestStreak).isEqualTo(2)
     }
@@ -99,6 +100,6 @@ class HabitStatsTest {
         id = date.toString(),
         habitId = "h1",
         userId = "u1",
-        completedDate = date
+        completedDate = date,
     )
 }

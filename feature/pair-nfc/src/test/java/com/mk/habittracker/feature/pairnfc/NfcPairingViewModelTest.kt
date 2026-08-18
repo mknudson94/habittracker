@@ -28,13 +28,12 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
 class NfcPairingViewModelTest {
-
     private val tagBus: TagBus = mockk(relaxed = true)
     private val writeNfcTagUseCase: WriteNfcTagUseCase = mockk()
     private val nfcReaderModeFlag: NfcReaderModeFlag = mockk(relaxed = true)
     private val habitId = "test-habit-id"
     private val tagsFlow = MutableSharedFlow<Tag>()
-    
+
     private val testDispatcher = UnconfinedTestDispatcher()
 
     private lateinit var viewModel: NfcPairingViewModel
@@ -43,7 +42,7 @@ class NfcPairingViewModelTest {
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         every { tagBus.tags } returns tagsFlow
-        
+
         viewModel = NfcPairingViewModel(habitId, tagBus, writeNfcTagUseCase, nfcReaderModeFlag)
     }
 
@@ -62,29 +61,33 @@ class NfcPairingViewModelTest {
     fun `successful write transitions to Success state`() = runTest {
         val tag: Tag = mockk()
         val tagId = byteArrayOf(1, 2, 3)
-        every { writeNfcTagUseCase.execute(tag, habitId, false) } returns WriteNfcResult.Success(tagId)
+        every {
+            writeNfcTagUseCase.execute(tag, habitId, false)
+        } returns WriteNfcResult.Success(tagId)
 
         viewModel.pairingState.test {
             assertThat(awaitItem()).isEqualTo(PairNfcTagState.ReadyToScan)
-            
+
             tagsFlow.emit(tag)
-            
+
             assertThat(awaitItem()).isEqualTo(PairNfcTagState.Success(tagId))
         }
-        
+
         verify { nfcReaderModeFlag.releaseReaderMode() }
     }
 
     @Test
     fun `tag not blank transitions to ConfirmOverwrite`() = runTest {
         val tag: Tag = mockk()
-        every { writeNfcTagUseCase.execute(tag, habitId, false) } returns WriteNfcResult.DidNotOverwrite
+        every {
+            writeNfcTagUseCase.execute(tag, habitId, false)
+        } returns WriteNfcResult.DidNotOverwrite
 
         viewModel.pairingState.test {
             assertThat(awaitItem()).isEqualTo(PairNfcTagState.ReadyToScan)
-            
+
             tagsFlow.emit(tag)
-            
+
             assertThat(awaitItem()).isEqualTo(PairNfcTagState.ConfirmOverwrite(false))
         }
     }
@@ -92,18 +95,20 @@ class NfcPairingViewModelTest {
     @Test
     fun `confirmOverwrite transitions state and requests reader mode`() = runTest {
         val tag: Tag = mockk()
-        every { writeNfcTagUseCase.execute(tag, habitId, false) } returns WriteNfcResult.DidNotOverwrite
-        
+        every {
+            writeNfcTagUseCase.execute(tag, habitId, false)
+        } returns WriteNfcResult.DidNotOverwrite
+
         viewModel.pairingState.test {
             assertThat(awaitItem()).isEqualTo(PairNfcTagState.ReadyToScan)
             tagsFlow.emit(tag)
             assertThat(awaitItem()).isEqualTo(PairNfcTagState.ConfirmOverwrite(false))
-            
+
             viewModel.confirmOverwrite()
-            
+
             assertThat(awaitItem()).isEqualTo(PairNfcTagState.ConfirmOverwrite(true))
         }
-        
+
         verify { nfcReaderModeFlag.requestReaderMode() }
     }
 
@@ -111,31 +116,35 @@ class NfcPairingViewModelTest {
     fun `write error transitions to Error state`() = runTest {
         val tag: Tag = mockk()
         val errorMessage = "Write failed"
-        every { writeNfcTagUseCase.execute(tag, habitId, false) } returns WriteNfcResult.Error(errorMessage)
+        every {
+            writeNfcTagUseCase.execute(tag, habitId, false)
+        } returns WriteNfcResult.Error(errorMessage)
 
         viewModel.pairingState.test {
             assertThat(awaitItem()).isEqualTo(PairNfcTagState.ReadyToScan)
-            
+
             tagsFlow.emit(tag)
-            
+
             assertThat(awaitItem()).isEqualTo(PairNfcTagState.Error(errorMessage))
         }
-        
+
         verify { nfcReaderModeFlag.releaseReaderMode() }
     }
 
     @Test
     fun `tryAgain resets to ReadyToScan`() = runTest {
         val tag: Tag = mockk()
-        every { writeNfcTagUseCase.execute(tag, habitId, false) } returns WriteNfcResult.Error("fail")
-        
+        every {
+            writeNfcTagUseCase.execute(tag, habitId, false)
+        } returns WriteNfcResult.Error("fail")
+
         viewModel.pairingState.test {
             assertThat(awaitItem()).isEqualTo(PairNfcTagState.ReadyToScan)
             tagsFlow.emit(tag)
             assertThat(awaitItem()).isInstanceOf(PairNfcTagState.Error::class.java)
-            
+
             viewModel.tryAgain()
-            
+
             assertThat(awaitItem()).isEqualTo(PairNfcTagState.ReadyToScan)
         }
     }

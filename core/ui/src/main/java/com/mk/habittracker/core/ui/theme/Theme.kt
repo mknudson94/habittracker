@@ -251,57 +251,57 @@ private val highContrastDarkColorScheme = darkColorScheme(
 )
 
 val extendedLight = ExtendedColorScheme(
-  success = ColorFamily(
-      successLight,
-      onSuccessLight,
-      successContainerLight,
-      onSuccessContainerLight,
-  ),
+    success = ColorFamily(
+        successLight,
+        onSuccessLight,
+        successContainerLight,
+        onSuccessContainerLight,
+    ),
 )
 
 val extendedDark = ExtendedColorScheme(
-  success = ColorFamily(
-      successDark,
-      onSuccessDark,
-      successContainerDark,
-      onSuccessContainerDark,
-  ),
+    success = ColorFamily(
+        successDark,
+        onSuccessDark,
+        successContainerDark,
+        onSuccessContainerDark,
+    ),
 )
 
 val extendedLightMediumContrast = ExtendedColorScheme(
-  success = ColorFamily(
-      successLightMediumContrast,
-      onSuccessLightMediumContrast,
-      successContainerLightMediumContrast,
-      onSuccessContainerLightMediumContrast,
-  ),
+    success = ColorFamily(
+        successLightMediumContrast,
+        onSuccessLightMediumContrast,
+        successContainerLightMediumContrast,
+        onSuccessContainerLightMediumContrast,
+    ),
 )
 
 val extendedLightHighContrast = ExtendedColorScheme(
-  success = ColorFamily(
-      successLightHighContrast,
-      onSuccessLightHighContrast,
-      successContainerLightHighContrast,
-      onSuccessContainerLightHighContrast,
-  ),
+    success = ColorFamily(
+        successLightHighContrast,
+        onSuccessLightHighContrast,
+        successContainerLightHighContrast,
+        onSuccessContainerLightHighContrast,
+    ),
 )
 
 val extendedDarkMediumContrast = ExtendedColorScheme(
-  success = ColorFamily(
-      successDarkMediumContrast,
-      onSuccessDarkMediumContrast,
-      successContainerDarkMediumContrast,
-      onSuccessContainerDarkMediumContrast,
-  ),
+    success = ColorFamily(
+        successDarkMediumContrast,
+        onSuccessDarkMediumContrast,
+        successContainerDarkMediumContrast,
+        onSuccessContainerDarkMediumContrast,
+    ),
 )
 
 val extendedDarkHighContrast = ExtendedColorScheme(
-  success = ColorFamily(
-      successDarkHighContrast,
-      onSuccessDarkHighContrast,
-      successContainerDarkHighContrast,
-      onSuccessContainerDarkHighContrast,
-  ),
+    success = ColorFamily(
+        successDarkHighContrast,
+        onSuccessDarkHighContrast,
+        successContainerDarkHighContrast,
+        onSuccessContainerDarkHighContrast,
+    ),
 )
 
 @Immutable
@@ -309,11 +309,14 @@ data class ColorFamily(
     val color: Color,
     val onColor: Color,
     val colorContainer: Color,
-    val onColorContainer: Color
+    val onColorContainer: Color,
 )
 
 val unspecified_scheme = ColorFamily(
-    Color.Unspecified, Color.Unspecified, Color.Unspecified, Color.Unspecified
+    color = Color.Unspecified,
+    onColor = Color.Unspecified,
+    colorContainer = Color.Unspecified,
+    onColorContainer = Color.Unspecified,
 )
 
 val LocalExtendedColorScheme = staticCompositionLocalOf {
@@ -342,31 +345,28 @@ fun HabitTrackerTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,
-    content: @Composable() () -> Unit
+    content: @Composable () -> Unit,
 ) {
-  val colorScheme = when {
-      dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-          val context = LocalContext.current
-          if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-      }
-      
-      darkTheme -> darkScheme
-      else -> lightScheme
-  }
+    val colorScheme = when {
+        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            val context = LocalContext.current
+            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }
 
-  val extendedColorScheme = when {
-      darkTheme -> extendedDark
-      else -> extendedLight
-  }
+        darkTheme -> darkScheme
+        else -> lightScheme
+    }
 
-  CompositionLocalProvider(
-      LocalExtendedColorScheme provides extendedColorScheme
-  ) {
-      MaterialTheme(
-          colorScheme = colorScheme,
-          typography = AppTypography,
-          content = content
-      )
-  }
+    val extendedColorScheme = when {
+        darkTheme -> extendedDark
+        else -> extendedLight
+    }
+
+    CompositionLocalProvider(LocalExtendedColorScheme provides extendedColorScheme) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = AppTypography,
+            content = content,
+        )
+    }
 }
-

@@ -30,13 +30,12 @@ import org.robolectric.RobolectricTestRunner
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
 class LoginViewModelTest {
-
     private val auth: FirebaseAuth = mockk(relaxed = true)
     private val googleSignInManager: GoogleSignInManager = mockk(relaxed = true)
     private val firebaseUser: FirebaseUser = mockk()
     private val authResult: AuthResult = mockk()
     private val testDispatcher = UnconfinedTestDispatcher()
-    
+
     private lateinit var viewModel: LoginViewModel
 
     @Before
@@ -44,7 +43,7 @@ class LoginViewModelTest {
         Dispatchers.setMain(testDispatcher)
         every { auth.currentUser } returns null
         every { authResult.user } returns firebaseUser
-        
+
         viewModel = LoginViewModel(auth, googleSignInManager)
     }
 
@@ -67,10 +66,10 @@ class LoginViewModelTest {
 
         viewModel.authState.test {
             assertThat(awaitItem()).isNull() // initial
-            
+
             every { auth.currentUser } returns firebaseUser
             listenerSlot.captured.onAuthStateChanged(auth)
-            
+
             assertThat(awaitItem()).isEqualTo(firebaseUser)
         }
     }
@@ -79,8 +78,10 @@ class LoginViewModelTest {
     fun `signIn updates authState on success`() = runTest {
         val email = "test@example.com"
         val password = "password"
-        
-        every { auth.signInWithEmailAndPassword(email, password) } returns Tasks.forResult(authResult)
+
+        every {
+            auth.signInWithEmailAndPassword(email, password)
+        } returns Tasks.forResult(authResult)
 
         viewModel.authState.test {
             assertThat(awaitItem()).isNull() // Initial value
@@ -94,10 +95,13 @@ class LoginViewModelTest {
         val email = "test@example.com"
         val password = "password"
 
-        every { auth.createUserWithEmailAndPassword(email, password) } returns Tasks.forResult(authResult)
+        every {
+            auth.createUserWithEmailAndPassword(email, password)
+        } returns Tasks.forResult(authResult)
 
         viewModel.authState.test {
-            assertThat(awaitItem()).isNull() // Initial value
+            // Initial value
+            assertThat(awaitItem()).isNull()
             viewModel.signUp(email, password)
             assertThat(awaitItem()).isEqualTo(firebaseUser)
         }
@@ -108,7 +112,7 @@ class LoginViewModelTest {
         every { auth.currentUser } returns firebaseUser
         // Re-create to pick up the user
         viewModel = LoginViewModel(auth, googleSignInManager)
-        
+
         viewModel.signOut()
 
         verify { auth.signOut() }
@@ -122,9 +126,15 @@ class LoginViewModelTest {
         val idToken = "id-token"
         val credential = mockk<com.google.firebase.auth.AuthCredential>()
 
-        coEvery { googleSignInManager.requestGoogleCredential(any(), any(), any()) } returns idToken
-        every { GoogleAuthProvider.getCredential(idToken, null) } returns credential
-        every { auth.signInWithCredential(credential) } returns Tasks.forResult(authResult)
+        coEvery {
+            googleSignInManager.requestGoogleCredential(any(), any(), any())
+        } returns idToken
+        every {
+            GoogleAuthProvider.getCredential(idToken, null)
+        } returns credential
+        every {
+            auth.signInWithCredential(credential)
+        } returns Tasks.forResult(authResult)
 
         viewModel.authState.test {
             assertThat(awaitItem()).isNull()

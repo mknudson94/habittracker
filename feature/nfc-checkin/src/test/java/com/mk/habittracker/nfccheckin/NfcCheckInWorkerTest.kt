@@ -26,7 +26,6 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
 class NfcCheckInWorkerTest {
-
     private lateinit var context: Context
     private val nfcCheckInHandler: NfcCheckInHandler = mockk(relaxed = true)
     private val habitRepository: HabitRepository = mockk(relaxed = true)
@@ -42,7 +41,7 @@ class NfcCheckInWorkerTest {
         context = ApplicationProvider.getApplicationContext()
         every { auth.currentUser } returns firebaseUser
         every { firebaseUser.uid } returns userId
-        
+
         val habit = Habit(habitId, userId, "Drink Water", 123456L)
         every { habitRepository.getHabit(userId, habitId) } returns flowOf(habit)
         coEvery { habitRepository.hasCheckedInToday(habitId) } returns false
@@ -55,33 +54,33 @@ class NfcCheckInWorkerTest {
             context = context,
             inputData = workDataOf(
                 NFC_UID_KEY to tagId,
-                NFC_HABIT_ID_KEY to habitId
-            )
+                NFC_HABIT_ID_KEY to habitId,
+            ),
         ).setWorkerFactory(
             object : androidx.work.WorkerFactory() {
                 override fun createWorker(
                     appContext: Context,
                     workerClassName: String,
-                    workerParameters: androidx.work.WorkerParameters
-                ): ListenableWorker? {
-                    return NfcCheckInWorker(
-                        appContext,
-                        workerParameters,
-                        nfcCheckInHandler,
-                        habitRepository,
-                        auth
-                    )
-                }
-            }
+                    workerParameters: androidx.work.WorkerParameters,
+                ) = NfcCheckInWorker(
+                    appContext,
+                    workerParameters,
+                    nfcCheckInHandler,
+                    habitRepository,
+                    auth,
+                )
+            },
         ).build()
 
         val result = worker.doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.success())
         coVerify {
-            nfcCheckInHandler.checkIn(match {
-                it.habitId == habitId && it.uid.contentEquals(tagId)
-            })
+            nfcCheckInHandler.checkIn(
+                match {
+                    it.habitId == habitId && it.uid.contentEquals(tagId)
+                },
+            )
         }
     }
 
@@ -92,24 +91,22 @@ class NfcCheckInWorkerTest {
         val worker = TestListenableWorkerBuilder<NfcCheckInWorker>(
             context = context,
             inputData = workDataOf(
-                NFC_HABIT_ID_KEY to habitId
-            )
+                NFC_HABIT_ID_KEY to habitId,
+            ),
         ).setWorkerFactory(
             object : androidx.work.WorkerFactory() {
                 override fun createWorker(
                     appContext: Context,
                     workerClassName: String,
-                    workerParameters: androidx.work.WorkerParameters
-                ): ListenableWorker? {
-                    return NfcCheckInWorker(
-                        appContext,
-                        workerParameters,
-                        nfcCheckInHandler,
-                        habitRepository,
-                        auth
-                    )
-                }
-            }
+                    workerParameters: androidx.work.WorkerParameters,
+                ): ListenableWorker = NfcCheckInWorker(
+                    appContext,
+                    workerParameters,
+                    nfcCheckInHandler,
+                    habitRepository,
+                    auth,
+                )
+            },
         ).build()
 
         val result = worker.doWork()

@@ -20,13 +20,13 @@ import javax.inject.Singleton
 @Module
 @TestInstallIn(
     components = [SingletonComponent::class],
-    replaces = [AppModule::class]
+    replaces = [AppModule::class],
 )
 object TestAppModule {
-
+    // Use Main for tests to avoid sync issues
     @Provides
     @Singleton
-    fun provideIoDispatcher(): CoroutineDispatcher = Dispatchers.Main // Use Main for tests to avoid sync issues
+    fun provideIoDispatcher(): CoroutineDispatcher = Dispatchers.Main
 
     @Provides
     @Singleton
@@ -40,10 +40,10 @@ object TestAppModule {
     @Singleton
     fun provideAppDatabase(
         @ApplicationContext context: Context,
-    ): AppDatabase =
-        Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
-            .allowMainThreadQueries()
-            .build()
+    ): AppDatabase = Room
+        .inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+        .allowMainThreadQueries()
+        .build()
 
     @Provides
     @Singleton

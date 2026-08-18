@@ -77,9 +77,7 @@ data class HabitDetail(
 )
 
 fun List<CheckIn>.computeStats(): HabitStats {
-    val datesDesc = this
-        .map { it.completedDate }
-        .sortedDescending()
+    val datesDesc = this.map { it.completedDate }.sortedDescending()
 
     if (datesDesc.isEmpty()) return HabitStats(0, 0, 0)
 
@@ -89,10 +87,15 @@ fun List<CheckIn>.computeStats(): HabitStats {
     if (ChronoUnit.DAYS.between(datesDesc.first(), today) <= 1) {
         currentStreak = 1
         var i = 1
-        while (i < datesDesc.size &&
-            ChronoUnit.DAYS.between(datesDesc[i], datesDesc[0]) == i.toLong()
+        while (
+            i < datesDesc.size &&
+            ChronoUnit.DAYS.between(
+                datesDesc[i],
+                datesDesc[0],
+            ) == i.toLong()
         ) {
-            currentStreak++; i++
+            currentStreak++
+            i++
         }
     }
 

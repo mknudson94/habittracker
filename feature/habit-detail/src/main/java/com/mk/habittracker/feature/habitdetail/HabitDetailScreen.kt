@@ -52,8 +52,7 @@ import kotlinx.collections.immutable.toPersistentList
 import kotlinx.collections.immutable.toPersistentMap
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneId
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import org.threeten.bp.format.DateTimeFormatter
 import java.time.temporal.WeekFields
 
 @Composable
@@ -143,7 +142,6 @@ private fun OverviewSection(
     bestStreak: Int,
     totalCheckIns: Int,
     createdAt: Long,
-
 ) {
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {
         Row(
@@ -153,13 +151,13 @@ private fun OverviewSection(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = "CURRENT STREAK",
-                    style = MaterialTheme.typography.labelLarge
+                    style = MaterialTheme.typography.labelLarge,
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = currentStreak.toString(),
                         style = MaterialTheme.typography.displayLarge.copy(
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
                         ),
                     )
                     Spacer(Modifier.width(8.dp))
@@ -177,19 +175,25 @@ private fun OverviewSection(
                 Column {
                     Text(
                         bestStreak.toString(),
-                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                        ),
                     )
                     Text(
                         totalCheckIns.toString(),
-                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                        ),
                     )
-                    // todo: date format
-                    val createdString =
-                        Instant.ofEpochMilli(createdAt).atZone(ZoneId.systemDefault())
-                            .format(org.threeten.bp.format.DateTimeFormatter.ofPattern("MMM dd"))
+                    val createdAtString = Instant
+                        .ofEpochMilli(createdAt)
+                        .atZone(ZoneId.systemDefault())
+                        .format(DateTimeFormatter.ofPattern("MMM dd"))
                     Text(
-                        createdString,
-                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+                        text = createdAtString,
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                        ),
                     )
                 }
             }
@@ -200,7 +204,7 @@ private fun OverviewSection(
 @Composable
 private fun NfcSection(
     isPaired: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     ElevatedCard(
         modifier =
@@ -250,7 +254,6 @@ private fun NfcBodyPaired() {
             )
         }
     }
-
 }
 
 @Composable
@@ -264,20 +267,20 @@ private fun NfcBodyNotPaired() {
                     .fillMaxHeight()
                     .aspectRatio(1f)
                     .drawBehind {
-                                drawCircle(
-                                    color = Color.Black,
-                                    alpha = .7f,
-                                    style =
-                                        Stroke(
-                                            width = 1.dp.toPx(),
-                                            pathEffect =
-                                                PathEffect.dashPathEffect(
-                                                    floatArrayOf(8f, 8f),
-                                                    0f,
-                                                ),
+                        drawCircle(
+                            color = Color.Black,
+                            alpha = .7f,
+                            style =
+                                Stroke(
+                                    width = 1.dp.toPx(),
+                                    pathEffect =
+                                        PathEffect.dashPathEffect(
+                                            floatArrayOf(8f, 8f),
+                                            0f,
                                         ),
-                                )
-                            },
+                                ),
+                        )
+                    },
             contentAlignment = Alignment.Center,
         ) {
             Icon(
@@ -319,7 +322,7 @@ private fun HistorySection(nCheckIns: String) {
 @Composable
 @Preview(showBackground = true)
 private fun HabitDetailScreenPreview(
-    @PreviewParameter(IsPairedProvider::class) isPaired: Boolean,
+    @PreviewParameter(BooleanProvider::class) isPaired: Boolean,
 ) {
     AndroidThreeTen.init(LocalContext.current)
     HabitDetailScreen(
@@ -335,51 +338,47 @@ private fun HabitDetailScreenPreview(
                 currentStreak = 12,
                 bestStreak = 19,
                 totalCheckIns = 59,
-            )
+            ),
         ),
         checkIns = previewCheckIns.toPersistentList(),
         onBack = {},
     )
 }
 
-class IsPairedProvider: PreviewParameterProvider<Boolean> {
-    override val values: Sequence<Boolean> = sequenceOf(
-        true,
-        false
-    )
+class BooleanProvider : PreviewParameterProvider<Boolean> {
+    override val values: Sequence<Boolean> = sequenceOf(true, false)
 }
 
-private val previewDates =
-    listOf(
-        "2026-06-15",
-        "2026-06-16",
-        "2026-06-18",
-        "2026-06-20",
-        "2026-06-21",
-        "2026-06-23",
-        "2026-06-24",
-        "2026-06-27",
-        "2026-06-28",
-        "2026-06-29",
-        "2026-07-01",
-        "2026-07-02",
-        "2026-07-04",
-        "2026-07-05",
-        "2026-07-12",
-        "2026-07-14",
-        "2026-07-15",
-        "2026-07-17",
-        "2026-07-18",
-        "2026-07-20",
-        "2026-07-22",
-        "2026-07-23",
-        "2026-07-25",
-        "2026-07-26",
-        "2026-07-28",
-        "2026-07-29",
-        "2026-07-30",
-        "2026-08-01",
-        "2026-08-02",
-    )
+private val previewDates = listOf(
+    "2026-06-15",
+    "2026-06-16",
+    "2026-06-18",
+    "2026-06-20",
+    "2026-06-21",
+    "2026-06-23",
+    "2026-06-24",
+    "2026-06-27",
+    "2026-06-28",
+    "2026-06-29",
+    "2026-07-01",
+    "2026-07-02",
+    "2026-07-04",
+    "2026-07-05",
+    "2026-07-12",
+    "2026-07-14",
+    "2026-07-15",
+    "2026-07-17",
+    "2026-07-18",
+    "2026-07-20",
+    "2026-07-22",
+    "2026-07-23",
+    "2026-07-25",
+    "2026-07-26",
+    "2026-07-28",
+    "2026-07-29",
+    "2026-07-30",
+    "2026-08-01",
+    "2026-08-02",
+)
 
 private val previewCheckIns = previewDates.map { checkIn(it) }

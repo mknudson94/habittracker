@@ -125,7 +125,8 @@ internal fun HabitCard(
                                         .background(
                                             color =
                                                 if (checkIns.any { it.completedDate == day }) {
-                                                    HabitTrackerTheme.extendedColorScheme.success.color
+                                                    HabitTrackerTheme
+                                                        .extendedColorScheme.success.color
                                                 } else {
                                                     HabitTrackerTheme.colorScheme.surfaceDim
                                                 },
@@ -139,11 +140,11 @@ internal fun HabitCard(
                 when {
                     streakLength > 2 -> StreakBadge(streakLength)
                     streakLength > 0 -> Text(
-                        "day $streakLength", style = HabitTrackerTheme.typography.bodyLarge.copy(
-                            fontWeight = FontWeight.Light
-                        )
+                        text = "day $streakLength",
+                        style = HabitTrackerTheme.typography.bodyLarge.copy(
+                            fontWeight = FontWeight.Light,
+                        ),
                     )
-
                     else -> {}
                 }
             }
@@ -157,13 +158,13 @@ private fun StreakBadge(streakLength: Int) {
         modifier = Modifier
             .wrapContentSize()
             .padding(end = 8.dp),
-        contentAlignment = Alignment.BottomEnd
+        contentAlignment = Alignment.BottomEnd,
     ) {
         Icon(
             modifier = Modifier.size(40.dp),
             painter = painterResource(R.drawable.outline_local_fire_department_24),
             contentDescription = "",
-            tint = HabitTrackerTheme.colorScheme.tertiary
+            tint = HabitTrackerTheme.colorScheme.tertiary,
         )
         val surfaceColor = HabitTrackerTheme.colorScheme.tertiaryContainer
         Text(
@@ -174,10 +175,9 @@ private fun StreakBadge(streakLength: Int) {
                 .drawBehind {
                     drawCircle(
                         color = surfaceColor,
-                        radius = size.maxDimension / 2f
+                        radius = size.maxDimension / 2f,
                     )
-                }
-
+                },
         )
     }
 }
