@@ -26,12 +26,11 @@ import java.time.LocalDate
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
 class UndoCheckInReceiverTest {
-
     private val repository: HabitRepository = mockk(relaxed = true)
     private val auth: FirebaseAuth = mockk()
     private val firebaseUser: FirebaseUser = mockk()
     private lateinit var context: Context
-    
+
     private lateinit var receiver: UndoCheckInReceiver
     private val testDispatcher = StandardTestDispatcher()
 
@@ -42,7 +41,7 @@ class UndoCheckInReceiverTest {
         receiver = UndoCheckInReceiver()
         receiver.repository = repository
         receiver.auth = auth
-        
+
         every { auth.currentUser } returns firebaseUser
         every { firebaseUser.uid } returns "user-1"
     }

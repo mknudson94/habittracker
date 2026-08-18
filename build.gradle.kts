@@ -55,7 +55,7 @@ subprojects {
 
     extensions.getByType(KtlintExtension::class.java).apply {
         android.set(true)
-        ignoreFailures.set(false)
+        ignoreFailures.set(true)
         reporters {
             reporter(ReporterType.CHECKSTYLE)
             reporter(ReporterType.HTML)

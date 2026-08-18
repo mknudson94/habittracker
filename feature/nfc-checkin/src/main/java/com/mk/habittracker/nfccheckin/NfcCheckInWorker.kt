@@ -38,7 +38,6 @@ class NfcCheckInWorker
         private val habitRepository: HabitRepository,
         private val auth: FirebaseAuth,
     ) : CoroutineWorker(appContext, workerParams) {
-
         override suspend fun doWork(): Result {
             val tagId = this.inputData.getByteArray(NFC_UID_KEY)
             val habitId = this.inputData.getString(NFC_HABIT_ID_KEY) ?: error("null habit id")

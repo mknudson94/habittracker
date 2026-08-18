@@ -24,7 +24,6 @@ import java.time.LocalDate
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
 class HabitDetailViewModelTest {
-
     private val repository: HabitRepository = mockk()
     private val auth: FirebaseAuth = mockk()
     private val firebaseUser: FirebaseUser = mockk()
@@ -39,7 +38,7 @@ class HabitDetailViewModelTest {
     fun setup() {
         every { auth.currentUser } returns firebaseUser
         every { firebaseUser.uid } returns userId
-        
+
         // Default returns to avoid crash during init
         every { repository.getHabitDetail(habitId) } returns flowOf(defaultDetail)
         every { repository.getCheckIns(any(), habitId) } returns flowOf(emptyList())
@@ -50,9 +49,9 @@ class HabitDetailViewModelTest {
         val habit = Habit(habitId, userId, "Exercise", 123456L)
         val stats = HabitStats(5, 10, 50)
         val detail = HabitDetail(habit, stats)
-        
+
         every { repository.getHabitDetail(habitId) } returns flowOf(detail)
-        
+
         val viewModel = HabitDetailViewModel(habitId, repository, auth)
 
         viewModel.habitDetail.test {
@@ -64,11 +63,11 @@ class HabitDetailViewModelTest {
     fun `checkIns reflects repository data`() = runTest {
         val checkInList = listOf(
             CheckIn("1", habitId, userId, LocalDate.now()),
-            CheckIn("2", habitId, userId, LocalDate.now().minusDays(1))
+            CheckIn("2", habitId, userId, LocalDate.now().minusDays(1)),
         )
-        
+
         every { repository.getCheckIns(userId, habitId) } returns flowOf(checkInList)
-        
+
         val viewModel = HabitDetailViewModel(habitId, repository, auth)
 
         viewModel.checkIns.test {
@@ -80,9 +79,9 @@ class HabitDetailViewModelTest {
     fun `userId uses anonymous when not logged in`() = runTest {
         every { auth.currentUser } returns null
         every { repository.getCheckIns("anonymous", habitId) } returns flowOf(emptyList())
-        
+
         HabitDetailViewModel(habitId, repository, auth)
-        
+
         verify { repository.getCheckIns("anonymous", habitId) }
     }
 }

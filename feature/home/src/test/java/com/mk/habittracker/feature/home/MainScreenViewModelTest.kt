@@ -28,7 +28,6 @@ import kotlin.uuid.ExperimentalUuidApi
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalUuidApi::class)
 @RunWith(RobolectricTestRunner::class)
 class MainScreenViewModelTest {
-
     private val repository: HabitRepository = mockk(relaxed = true)
     private val auth: FirebaseAuth = mockk()
     private val firebaseUser: FirebaseUser = mockk()
@@ -37,7 +36,7 @@ class MainScreenViewModelTest {
     private val userId = "test-user-id"
     private val habitsList = listOf(
         Habit("1", userId, "Habit 1", 100L),
-        Habit("2", userId, "Habit 2", 200L)
+        Habit("2", userId, "Habit 2", 200L),
     )
 
     private lateinit var viewModel: MainScreenViewModel
@@ -48,7 +47,7 @@ class MainScreenViewModelTest {
         every { auth.currentUser } returns firebaseUser
         every { firebaseUser.uid } returns userId
         every { repository.getHabits(userId) } returns flowOf(habitsList)
-        
+
         viewModel = MainScreenViewModel(repository, auth)
     }
 
@@ -81,9 +80,13 @@ class MainScreenViewModelTest {
         viewModel.toggleCheckIn(true, habitId)
 
         coVerify {
-            repository.addCheckIn(match {
-                it.habitId == habitId && it.userId == userId && it.completedDate == LocalDate.now()
-            })
+            repository.addCheckIn(
+                match {
+                    it.habitId == habitId &&
+                        it.userId == userId &&
+                        it.completedDate == LocalDate.now()
+                },
+            )
         }
     }
 
@@ -101,16 +104,16 @@ class MainScreenViewModelTest {
     fun `anonymous userId is used when not logged in`() = runTest {
         every { auth.currentUser } returns null
         every { repository.getHabits("anonymous") } returns flowOf(emptyList())
-        
+
         // Re-init to use the new auth state
         val vm = MainScreenViewModel(repository, auth)
-        
+
         vm.habits.test {
             assertThat(awaitItem()).isEmpty()
         }
-        
+
         vm.toggleCheckIn(true, "habit1")
-        
+
         coVerify {
             repository.addCheckIn(match { it.userId == "anonymous" })
         }

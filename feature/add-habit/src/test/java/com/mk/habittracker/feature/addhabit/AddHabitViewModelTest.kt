@@ -20,7 +20,6 @@ import kotlin.uuid.ExperimentalUuidApi
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalUuidApi::class)
 @RunWith(RobolectricTestRunner::class)
 class AddHabitViewModelTest {
-
     private val repository: HabitRepository = mockk(relaxed = true)
     private val firebaseAuth: FirebaseAuth = mockk()
     private val firebaseUser: FirebaseUser = mockk()
@@ -70,10 +69,10 @@ class AddHabitViewModelTest {
             repository.addHabit(
                 match { habit ->
                     habit.name == habitName &&
-                    habit.userId == "test-user-id" &&
-                    habit.tagId?.contentEquals(tagId) == true &&
-                    habit.id == viewModel.habitId
-                }
+                        habit.userId == "test-user-id" &&
+                        habit.tagId?.contentEquals(tagId) == true &&
+                        habit.id == viewModel.habitId
+                },
             )
         }
     }
@@ -90,10 +89,10 @@ class AddHabitViewModelTest {
     fun `onTagPaired can be called multiple times, keeping the last value`() {
         val tag1 = byteArrayOf(1)
         val tag2 = byteArrayOf(2)
-        
+
         viewModel.onTagPaired(tag1)
         assertThat(viewModel.tagId).isEqualTo(tag1)
-        
+
         viewModel.onTagPaired(tag2)
         assertThat(viewModel.tagId).isEqualTo(tag2)
     }
@@ -108,7 +107,7 @@ class AddHabitViewModelTest {
             repository.addHabit(
                 match { habit ->
                     habit.userId == "anonymous"
-                }
+                },
             )
         }
     }
@@ -123,7 +122,7 @@ class AddHabitViewModelTest {
             repository.addHabit(
                 match { habit ->
                     habit.createdAt in before..after
-                }
+                },
             )
         }
     }

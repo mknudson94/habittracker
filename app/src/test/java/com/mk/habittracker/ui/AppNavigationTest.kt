@@ -1,6 +1,6 @@
 package com.mk.habittracker.ui
 
-import androidx.compose.ui.test.*
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import com.google.firebase.auth.FirebaseUser
 import com.mk.habittracker.HiltTestActivity
@@ -23,7 +23,6 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(application = HiltTestApplication::class, sdk = [34])
 class AppNavigationTest {
-
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
 
@@ -39,7 +38,7 @@ class AppNavigationTest {
     fun app_starts_on_login_when_not_authenticated() {
         val viewModel: LoginViewModel = mockk(relaxed = true)
         every { viewModel.authState } returns MutableStateFlow(null)
-        
+
         composeTestRule.setContent {
             HabitTrackerTheme {
                 AppNavigation(viewModel = viewModel)
@@ -55,7 +54,7 @@ class AppNavigationTest {
         val mockUser: FirebaseUser = mockk()
         every { mockUser.uid } returns "test-user"
         every { viewModel.authState } returns MutableStateFlow(mockUser)
-        
+
         composeTestRule.setContent {
             HabitTrackerTheme {
                 AppNavigation(viewModel = viewModel)
