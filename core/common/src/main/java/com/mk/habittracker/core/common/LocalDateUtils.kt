@@ -7,14 +7,9 @@ import java.util.Locale
 data object LocalDateUtils {
     fun previousSevenDaysLabels(
         locale: Locale,
-        clock: LocalDate = LocalDate.now(),
-    ): Array<String> {
-        val today = clock
-        val labels = arrayOfNulls<String>(DAYS_IN_WEEK)
-        repeat(DAYS_IN_WEEK) { i ->
-            val day = today.minusDays(DAYS_IN_WEEK - (i + 1L))
-            labels[i] = day.dayOfWeek.getDisplayName(TextStyle.NARROW_STANDALONE, locale)
-        }
-        return labels as Array<String>
-    }
+        today: LocalDate = LocalDate.now(),
+    ): Array<String> = List(DAYS_IN_WEEK) { i ->
+        val day = today.minusDays(DAYS_IN_WEEK - (i + 1L))
+        day.dayOfWeek.getDisplayName(TextStyle.NARROW_STANDALONE, locale)
+    }.toTypedArray()
 }

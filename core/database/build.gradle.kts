@@ -18,10 +18,11 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:model"))
-    implementation(libs.androidx.room.ktx)
-    implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
+
+    api(libs.androidx.room.runtime)
+    api(project(":core:model"))
+
     testImplementation(libs.junit)
     testImplementation(libs.truth)
 }

@@ -1,7 +1,8 @@
 package com.mk.habittracker.ui
 
 import androidx.compose.ui.test.hasText
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
+import androidx.compose.ui.test.onFirst
 import com.google.firebase.auth.FirebaseUser
 import com.mk.habittracker.HiltTestActivity
 import com.mk.habittracker.core.ui.theme.HabitTrackerTheme

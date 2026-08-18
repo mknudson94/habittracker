@@ -68,7 +68,7 @@ fun extractNonceFromIdToken(idToken: String): String? =
         val payloadSegment = idToken.split(".")[1]
         val decodedBytes =
             Base64.decode(payloadSegment, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
-        JSONObject(String(decodedBytes)).optString("nonce", null)
+        JSONObject(String(decodedBytes)).optString("nonce", "")
     } catch (e: Exception) {
         Log.e("Sign In", "Failed to parse ID token nonce: $e")
         null

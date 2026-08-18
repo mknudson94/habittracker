@@ -28,21 +28,20 @@ dependencies {
 
     ksp(libs.hilt.android.compiler)
 
+    api(libs.androidx.compose.material3)
+    api(libs.androidx.compose.ui)
+    api(libs.hilt.android)
+
+    // TODO: whatever this credentials squiggly means
     implementation(libs.androidx.credentials)
-    implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.google.googleid)
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.firebase.auth)
-    implementation(libs.hilt.android)
     implementation(platform(libs.androidx.compose.bom))
     implementation(platform(libs.firebase.bom))
-    implementation(project(":core:ui"))
+
+    runtimeOnly(libs.androidx.credentials.play.services.auth)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockk)

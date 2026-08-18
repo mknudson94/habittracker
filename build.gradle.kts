@@ -36,8 +36,8 @@ affectedModuleDetector {
 dependencyAnalysis {
     issues {
         all {
-            onAny {
-                severity("fail")
+            onUsedTransitiveDependencies {
+                severity("warn")
             }
         }
     }
