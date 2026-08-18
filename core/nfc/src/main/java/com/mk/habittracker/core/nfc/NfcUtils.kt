@@ -31,14 +31,20 @@ fun Intent.parseHabitTrackerNdef(): HabitTrackerNdef? {
                 ?.filterIsInstance<NdefMessage>()
                 ?.toTypedArray()
         }
-    check(
-        !messages.isNullOrEmpty() &&
-            messages.size == 1 &&
-            messages.first().records.size == 2,
-    ) { "error, bad ndef" }
-    val records = messages.first().records
-    val habitRecord = records.first()
-    val habitId = habitRecord.payload.toString(Charsets.UTF_8)
+    return parseHabitTrackerNdef(tagId, messages)
+}
+
+/**
+ * Core parsing logic for Habit Tracker NDEF messages.
+ * Expects at least one record containing the habit ID.
+ */
+fun parseHabitTrackerNdef(
+    tagId: ByteArray?,
+    messages: Array<NdefMessage>?,
+): HabitTrackerNdef? {
+    val record = messages?.firstOrNull()?.records?.firstOrNull() ?: return null
+    val habitId = record.payload.toString(Charsets.UTF_8)
+
     return HabitTrackerNdef(
         uid = tagId ?: byteArrayOf(),
         habitId = habitId,
@@ -48,15 +54,7 @@ fun Intent.parseHabitTrackerNdef(): HabitTrackerNdef? {
 fun Tag.parseHabitTrackerNdef(): HabitTrackerNdef {
     val ndef = Ndef.get(this) ?: error("null ndef")
     val message = ndef.cachedNdefMessage ?: ndef.ndefMessage ?: error("null message")
-    val habitId =
-        message.records
-            .first()
-            .payload
-            .toString(Charsets.UTF_8)
-    return HabitTrackerNdef(
-        uid = this.id,
-        habitId = habitId,
-    )
+    return parseHabitTrackerNdef(this.id, arrayOf(message)) ?: error("failed to parse ndef")
 }
 
 data class HabitTrackerNdef(

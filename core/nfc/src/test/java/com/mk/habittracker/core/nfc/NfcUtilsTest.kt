@@ -14,6 +14,26 @@ import org.robolectric.annotation.Config
 @Config(sdk = [34])
 class NfcUtilsTest {
     @Test
+    fun `parseHabitTrackerNdef parses messages correctly`() {
+        val habitId = "habit_123"
+        val tagId = byteArrayOf(1, 2, 3, 4)
+
+        val record1 =
+            NdefRecord.createExternal(
+                "com.mk.habittracker",
+                "habit",
+                habitId.toByteArray(),
+            )
+        val ndefMessage = NdefMessage(arrayOf(record1))
+
+        val result = parseHabitTrackerNdef(tagId, arrayOf(ndefMessage))
+
+        assertThat(result).isNotNull()
+        assertThat(result?.habitId).isEqualTo(habitId)
+        assertThat(result?.uid).isEqualTo(tagId)
+    }
+
+    @Test
     fun `parseHabitTrackerNdef parses intent correctly`() {
         val habitId = "habit_123"
         val tagId = byteArrayOf(1, 2, 3, 4)

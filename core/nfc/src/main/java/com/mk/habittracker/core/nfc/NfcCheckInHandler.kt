@@ -109,7 +109,8 @@ class NfcCheckInHandler
                     .onEach { tag ->
                         Log.d(
                             "NfcCheckInHandler",
-                            "received tag: $tag\n\treaderMode is currently ${nfcReaderModeFlag.readerModeRequested.value}",
+                            "received tag: $tag\n\t" +
+                                "readerMode is currently ${nfcReaderModeFlag.readerModeRequested.value}",
                         )
                         // only check in if nobody else (e.g. write flow) is scanning for tag events
                         if (!nfcReaderModeFlag.readerModeRequested.value) {
