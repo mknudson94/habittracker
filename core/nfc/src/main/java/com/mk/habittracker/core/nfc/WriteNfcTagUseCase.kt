@@ -1,9 +1,11 @@
 package com.mk.habittracker.core.nfc
 
+import android.nfc.FormatException
 import android.nfc.NdefMessage
 import android.nfc.NdefRecord
 import android.nfc.Tag
 import android.nfc.tech.Ndef
+import java.io.IOException
 import javax.inject.Inject
 
 class WriteNfcTagUseCase
@@ -27,7 +29,11 @@ class WriteNfcTagUseCase
                     ndef.writeNdefMessage(buildMessage(habitId))
                     WriteNfcResult.Success(tag.id)
                 }
-            } catch (e: Exception) {
+            } catch (e: IOException) {
+                WriteNfcResult.Error(e.localizedMessage.orEmpty())
+            } catch (e: FormatException) {
+                WriteNfcResult.Error(e.localizedMessage.orEmpty())
+            } catch (e: IllegalStateException) {
                 WriteNfcResult.Error(e.localizedMessage.orEmpty())
             } finally {
                 if (ndef != null) ndef.close()

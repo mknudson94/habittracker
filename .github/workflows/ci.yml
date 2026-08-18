@@ -1,11 +1,55 @@
-name: Unit Tests
+name: CI
 
 on:
   pull_request:
     branches: [ main ]
 
 jobs:
-  unit-test:
+  static-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Create google-services.json
+        run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 -d > app/src/google-services.json
+
+      - name: Run Detekt
+        run: ./gradlew detekt
+
+      - name: Run Ktlint
+        run: ./gradlew ktlintCheck
+
+      - name: Run Android Lint
+        run: ./gradlew lintDebug
+
+      - name: Run Build Health
+        run: ./gradlew buildHealth
+
+      - name: Upload Static Analysis Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: static-analysis-reports
+          path: |
+            **/build/reports/detekt/
+            **/build/reports/ktlint/
+            **/build/reports/lint-results-debug.html
+            **/build/reports/dependency-analysis/
+
+  unit-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -28,3 +72,13 @@ jobs:
 
       - name: Run affected unit tests
         run: ./gradlew runAffectedUnitTests -Paffected_module_detector.enable
+
+      - name: Build Release (Dry Run)
+        run: ./gradlew assembleRelease
+
+      - name: Upload Test Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-reports
+          path: "**/build/reports/tests/"
