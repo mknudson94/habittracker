@@ -272,13 +272,15 @@ internal fun NfcPairingScreen(
     }
 }
 
+private const val PULSE_DURATION_MILLIS = 1500
+
 @Composable
 fun Modifier.pulseEffect(
     targetScale: Float = 1.5f,
     initialScale: Float = 1f,
     brush: Brush = SolidColor(MaterialTheme.colorScheme.secondary),
     shape: Shape = CircleShape,
-    animationSpec: DurationBasedAnimationSpec<Float> = tween(1500),
+    animationSpec: DurationBasedAnimationSpec<Float> = tween(PULSE_DURATION_MILLIS),
 ): Modifier {
     val pulseTransition =
         rememberInfiniteTransition(
@@ -314,7 +316,7 @@ fun Modifier.doublePulseEffect(
     initialScale: Float = 1f,
     brush: Brush = SolidColor(MaterialTheme.colorScheme.secondary),
     shape: Shape = CircleShape,
-    durationMillis: Int = 1500,
+    durationMillis: Int = PULSE_DURATION_MILLIS,
     delay1: Float = 0f,
     delay2: Float = .4f,
 ): Modifier =
@@ -341,6 +343,8 @@ fun Modifier.doublePulseEffect(
                 ),
         )
 
+// todo - magic numbers :P
+@Suppress("MagicNumber")
 private fun Modifier.gradientCircleBackground(color: Color): Modifier =
     this.drawBehind {
         drawCircle(
@@ -362,7 +366,7 @@ private class PairingStatePreviewProvider : PreviewParameterProvider<PairNfcTagS
             sequenceOf(
                 PairNfcTagState.ReadyToScan,
                 PairNfcTagState.Error("There was an error"),
-                PairNfcTagState.Success(byteArrayOf(1, 2, 3)),
+                PairNfcTagState.Success(byteArrayOf()),
                 PairNfcTagState.ConfirmOverwrite(false),
                 PairNfcTagState.ConfirmOverwrite(true),
             )

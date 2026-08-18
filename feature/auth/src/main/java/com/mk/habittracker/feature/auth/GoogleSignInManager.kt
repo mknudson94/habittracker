@@ -63,13 +63,19 @@ fun generateSecureRandomNonce(byteLength: Int = 32): String {
     )
 }
 
-fun extractNonceFromIdToken(idToken: String): String? =
-    try {
-        val payloadSegment = idToken.split(".")[1]
+fun extractNonceFromIdToken(idToken: String): String? {
+    val segments = idToken.split(".")
+    if (segments.size < 2) return null
+    val payloadSegment = segments[1]
+    return try {
         val decodedBytes =
             Base64.decode(payloadSegment, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
         JSONObject(String(decodedBytes)).optString("nonce", "")
-    } catch (e: Exception) {
+    } catch (e: org.json.JSONException) {
+        Log.e("Sign In", "Failed to parse ID token nonce: $e")
+        null
+    } catch (e: IllegalArgumentException) {
         Log.e("Sign In", "Failed to parse ID token nonce: $e")
         null
     }
+}

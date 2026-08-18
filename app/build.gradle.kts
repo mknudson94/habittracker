@@ -83,7 +83,6 @@ dependencies {
     implementation(project(":feature:nfc-checkin"))
     implementation(project(":feature:pair-nfc"))
 
-
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.test.runner)

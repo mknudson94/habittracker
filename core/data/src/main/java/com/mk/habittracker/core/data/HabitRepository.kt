@@ -3,6 +3,7 @@ package com.mk.habittracker.core.data
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.mk.habittracker.core.database.HabitDao
 import com.mk.habittracker.core.database.asEntity
 import com.mk.habittracker.core.database.asExternalModel
@@ -56,7 +57,7 @@ class HabitRepository @Inject constructor(
 
                 val habits = result.documents.map { Habit.from(id = it.id, data = it.data) }
                 habitDao.addHabits(habits.map { it.asEntity() })
-            } catch (e: Exception) {
+            } catch (e: FirebaseFirestoreException) {
                 Log.e("HabitRepository", "Error pulling habits", e)
             }
         }
@@ -72,7 +73,7 @@ class HabitRepository @Inject constructor(
                     .document(habit.id)
                     .set(habit.toMap())
                     .await()
-            } catch (e: Exception) {
+            } catch (e: FirebaseFirestoreException) {
                 Log.e("HabitRepository", "Error pushing habit", e)
             }
         }
@@ -104,7 +105,7 @@ class HabitRepository @Inject constructor(
 
                 val checkIns = result.documents.map { CheckIn.from(id = it.id, data = it.data) }
                 habitDao.addCheckIns(checkIns.map { it.asEntity() })
-            } catch (e: Exception) {
+            } catch (e: FirebaseFirestoreException) {
                 Log.e("HabitRepository", "Error pulling check-ins", e)
             }
         }
@@ -120,7 +121,7 @@ class HabitRepository @Inject constructor(
                     .document(checkIn.id)
                     .set(checkIn.toMap())
                     .await()
-            } catch (e: Exception) {
+            } catch (e: FirebaseFirestoreException) {
                 Log.e("HabitRepository", "Error pushing check-in", e)
             }
         }
@@ -151,7 +152,7 @@ class HabitRepository @Inject constructor(
                         .delete()
                         .await()
                 }
-            } catch (e: Exception) {
+            } catch (e: FirebaseFirestoreException) {
                 Log.e("HabitRepository", "Error deleting check-in", e)
             }
         }
