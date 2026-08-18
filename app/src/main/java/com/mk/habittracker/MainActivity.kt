@@ -127,7 +127,7 @@ fun Intent?.asString(): String {
             sb
                 .append(key)
                 .append("=")
-                .append(extras.get(key))
+                .append(extras.getString(key))
                 .append(" ")
         }
     }

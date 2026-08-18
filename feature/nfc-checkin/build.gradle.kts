@@ -25,33 +25,30 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.hilt.common)
-    implementation(libs.androidx.hilt.work)
-    ksp(libs.hilt.android.compiler)
     ksp(libs.androidx.hilt.compiler)
+    ksp(libs.hilt.android.compiler)
+
+    api(libs.androidx.hilt.work)
+    api(libs.androidx.work.runtime)
+    api(libs.hilt.android)
+    api(project(":core:data"))
+    api(project(":core:nfc"))
+
+    compileOnly(libs.androidx.hilt.common)
 
     implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.work.runtime.ktx)
-    implementation(libs.hilt.android)
-    implementation(libs.material)
-    implementation(project(":core:ui"))
-    implementation(project(":core:nfc"))
-    implementation(project(":core:data"))
-    implementation(project(":core:model"))
     implementation(libs.firebase.auth)
     implementation(platform(libs.firebase.bom))
+    implementation(project(":core:model"))
+    implementation(project(":core:ui"))
 
-    testImplementation(libs.junit)
-    testImplementation(libs.mockk)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.truth)
-    testImplementation(libs.turbine)
-    testImplementation(libs.robolectric)
-    testImplementation(libs.androidx.work.testing)
-    testImplementation(libs.androidx.testcore)
-
-    androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.work.testing)
+
+    testImplementation(libs.androidx.testcore)
+    testImplementation(libs.androidx.work.testing)
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockk)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.truth)
 }

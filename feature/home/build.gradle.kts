@@ -24,34 +24,29 @@ android {
 }
 
 dependencies {
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.compose.ui.tooling)
-
     ksp(libs.hilt.android.compiler)
 
-    implementation(project(":core:model"))
-    implementation(project(":core:common"))
-    implementation(project(":core:data"))
-    implementation(project(":core:ui"))
-    implementation(project(":core:nfc"))
+    api(libs.androidx.compose.ui)
+    api(libs.kotlinx.collections.immutable)
+    api(project(":core:data"))
+    api(project(":core:model"))
 
-    implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
-    implementation(libs.kotlinx.collections.immutable)
     implementation(libs.hilt.android)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(platform(libs.firebase.bom))
+    implementation(project(":core:common"))
+    implementation(project(":core:ui"))
 
     testImplementation(libs.junit)
-    testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockk)
+    testImplementation(libs.robolectric)
     testImplementation(libs.truth)
     testImplementation(libs.turbine)
-    testImplementation(libs.robolectric)
 }

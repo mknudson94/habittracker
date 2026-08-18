@@ -25,15 +25,17 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:model"))
-    implementation(project(":core:data"))
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth)
-    implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
+
+    api(libs.androidx.lifecycle.common)
+    api(libs.hilt.android)
+    api(project(":core:data"))
+
+    implementation(libs.firebase.auth)
+    implementation(platform(libs.firebase.bom))
+    implementation(project(":core:model"))
+
     testImplementation(libs.junit)
-    testImplementation(libs.truth)
     testImplementation(libs.robolectric)
+    testImplementation(libs.truth)
 }

@@ -24,7 +24,7 @@ class HabitTrackerApp :
         createCheckInNotificationChannel(this)
     }
 
-    override fun getWorkManagerConfiguration(): Configuration =
+    override val workManagerConfiguration: Configuration =
         Configuration
             .Builder()
             .setWorkerFactory(workerFactory)

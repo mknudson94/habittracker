@@ -22,13 +22,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:model"))
+    api(libs.androidx.compose.material3)
+    api(libs.androidx.compose.ui)
+
     implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.core.ktx)
-    testImplementation(libs.junit)
-    testImplementation(libs.truth)
-    testImplementation(libs.robolectric)
 }

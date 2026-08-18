@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
 }
 
@@ -19,18 +18,22 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:model"))
-    implementation(project(":core:database"))
-    implementation(libs.androidx.core.ktx)
-    implementation(platform(libs.firebase.bom))
+    ksp(libs.hilt.android.compiler)
+
+    api(libs.dagger)
+    api(libs.javax.inject)
+    api(project(":core:database"))
+    api(project(":core:model"))
+
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.android.compiler)
+    implementation(platform(libs.firebase.bom))
+
     testImplementation(libs.junit)
-    testImplementation(libs.truth)
-    testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockk)
+    testImplementation(libs.truth)
     testImplementation(libs.turbine)
-    testImplementation(libs.robolectric)
+
+    testRuntimeOnly(libs.robolectric)
 }

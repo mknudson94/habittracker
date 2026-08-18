@@ -22,11 +22,35 @@ import java.time.LocalDate
 )
 data class CheckInEntity(
     val id: String,
-    @ColumnInfo(name = "habit_id") val habitId: String,
+    @ColumnInfo(name = "habit_id", index = true) val habitId: String,
     @ColumnInfo(name = "user_id") val userId: String,
     @ColumnInfo(name = "completed_date") val completedDate: LocalDate,
     @ColumnInfo(name = "nfc_tag_uid", typeAffinity = ColumnInfo.BLOB) val nfcUid: ByteArray? = null,
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as CheckInEntity
+
+        if (id != other.id) return false
+        if (habitId != other.habitId) return false
+        if (userId != other.userId) return false
+        if (completedDate != other.completedDate) return false
+        if (!nfcUid.contentEquals(other.nfcUid)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + habitId.hashCode()
+        result = 31 * result + userId.hashCode()
+        result = 31 * result + completedDate.hashCode()
+        result = 31 * result + (nfcUid?.contentHashCode() ?: 0)
+        return result
+    }
+}
 
 fun CheckInEntity.asExternalModel() =
     CheckIn(
