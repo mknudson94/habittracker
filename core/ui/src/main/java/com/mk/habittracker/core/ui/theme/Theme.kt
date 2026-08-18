@@ -1,3 +1,5 @@
+@file:Suppress("UnusedPrivateProperty")
+
 package com.mk.habittracker.core.ui.theme
 
 import android.os.Build

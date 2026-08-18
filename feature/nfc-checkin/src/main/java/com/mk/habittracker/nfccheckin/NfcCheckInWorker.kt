@@ -28,6 +28,11 @@ internal const val NFC_HABIT_ID_KEY = "nfc_habit_id"
 const val CHANNEL_ID = "nfc_checkin_notification_channel"
 private const val NOTIFICATION_TIMEOUT = 12_000L
 
+private const val ONE_DAY_STREAK_LENGTH = 1
+private const val SHORT_STREAK_LENGTH = 2
+private const val MEDIUM_STREAK_LENGTH = 7
+private const val LONG_STREAK_LENGTH = 30
+
 @HiltWorker
 class NfcCheckInWorker
     @AssistedInject
@@ -175,18 +180,23 @@ class NfcCheckInWorker
             val title = appContext.getString(R.string.check_in_notification_title, habitName)
             val body =
                 when {
-                    streakLength >= 30 -> appContext.getString(R.string.streak_day_x, streakLength)
-                    streakLength >= 7 ->
+                    streakLength >= LONG_STREAK_LENGTH -> appContext.getString(
+                        R.string.streak_day_x,
+                        streakLength,
+                    )
+                    streakLength >= MEDIUM_STREAK_LENGTH ->
                         appContext.getString(
                             R.string.streak_becoming_habit,
                             streakLength,
                         )
-                    streakLength >= 2 ->
+                    streakLength >= SHORT_STREAK_LENGTH ->
                         appContext.getString(
                             R.string.streak_in_a_row,
                             streakLength,
                         )
-                    streakLength == 1 -> appContext.getString(R.string.streak_first_one)
+                    streakLength == ONE_DAY_STREAK_LENGTH -> appContext.getString(
+                        R.string.streak_first_one,
+                    )
                     else -> error("streak length should be greater than zero, was $streakLength")
                 }
             return title to body

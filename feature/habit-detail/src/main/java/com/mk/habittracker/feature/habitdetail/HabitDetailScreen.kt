@@ -303,6 +303,7 @@ private fun NfcBodyNotPaired() {
     }
 }
 
+@Suppress("UnusedPrivateMember")
 @Composable
 private fun HistorySection(nCheckIns: String) {
     ElevatedCard(modifier = Modifier.fillMaxWidth()) {

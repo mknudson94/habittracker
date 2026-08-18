@@ -7,6 +7,7 @@ import androidx.credentials.exceptions.GetCredentialException
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.GoogleAuthProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,7 +40,7 @@ class LoginViewModel
                 try {
                     val result = auth.signInWithEmailAndPassword(email, password).await()
                     _authState.value = result.user
-                } catch (e: Exception) {
+                } catch (e: FirebaseAuthException) {
                     Log.e("login", "failed to log in: $e")
                 }
             }
@@ -68,7 +69,7 @@ class LoginViewModel
                     val firebaseCredential = GoogleAuthProvider.getCredential(googleIdToken, null)
                     val result = auth.signInWithCredential(firebaseCredential).await()
                     _authState.value = result.user
-                } catch (e: Exception) {
+                } catch (e: FirebaseAuthException) {
                     Log.e("login", "failed to log in: $e")
                 }
             }
@@ -82,7 +83,7 @@ class LoginViewModel
                 try {
                     val result = auth.createUserWithEmailAndPassword(email, password).await()
                     _authState.value = result.user
-                } catch (e: Exception) {
+                } catch (e: FirebaseAuthException) {
                     Log.e("login", "failed to sign up: $e")
                 }
             }
