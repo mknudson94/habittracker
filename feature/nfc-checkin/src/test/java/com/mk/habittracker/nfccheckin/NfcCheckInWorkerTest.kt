@@ -45,7 +45,7 @@ class NfcCheckInWorkerTest {
         val habit = Habit(habitId, userId, "Drink Water", 123456L)
         every { habitRepository.getHabit(userId, habitId) } returns flowOf(habit)
         coEvery { habitRepository.hasCheckedInToday(habitId) } returns false
-        coEvery { habitRepository.getCurrentStreak(habitId) } returns 5
+        coEvery { habitRepository.getCurrentStreak(userId, habitId) } returns 5
     }
 
     @Test

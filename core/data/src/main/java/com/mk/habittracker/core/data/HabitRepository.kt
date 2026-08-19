@@ -46,6 +46,7 @@ class HabitRepository @Inject constructor(
     ): Flow<Habit?> = habitDao.getHabit(userId, habitId).map { it.asExternalModel() }
 
     private fun pullHabits(userId: String) {
+        if (auth.currentUser?.uid != userId) return
         scope.launch {
             try {
                 val result =
@@ -65,6 +66,15 @@ class HabitRepository @Inject constructor(
 
     suspend fun addHabit(habit: Habit) {
         habitDao.addHabit(habit.asEntity())
+
+        val currentUserId = auth.currentUser?.uid
+        if (currentUserId != habit.userId) {
+            Log.w(
+                "HabitRepository",
+                "Skipping Fstore sync: auth UID $currentUserId != habit UID ${habit.userId}",
+            )
+            return
+        }
 
         scope.launch {
             try {
@@ -93,6 +103,7 @@ class HabitRepository @Inject constructor(
         habitId: String,
         userId: String,
     ) {
+        if (auth.currentUser?.uid != userId) return
         scope.launch {
             try {
                 val result =
@@ -114,6 +125,15 @@ class HabitRepository @Inject constructor(
     suspend fun addCheckIn(checkIn: CheckIn) {
         habitDao.addCheckIn(checkIn.asEntity())
 
+        val currentUserId = auth.currentUser?.uid
+        if (currentUserId != checkIn.userId) {
+            Log.w(
+                "HabitRepository",
+                "Skipping Firestore sync: user auth $currentUserId != check-in ${checkIn.userId}",
+            )
+            return
+        }
+
         scope.launch {
             try {
                 db
@@ -132,7 +152,9 @@ class HabitRepository @Inject constructor(
         date: LocalDate,
         userId: String,
     ) {
-        habitDao.deleteCheckIn(habitId, date.toString())
+        habitDao.deleteCheckIn(userId, habitId, date.toString())
+
+        if (auth.currentUser?.uid != userId) return
 
         scope.launch {
             try {
@@ -161,8 +183,11 @@ class HabitRepository @Inject constructor(
     suspend fun hasCheckedInToday(habitId: String): Boolean =
         habitDao.getCheckInForToday(auth.uid.orEmpty(), habitId) != null
 
-    suspend fun getCurrentStreak(habitId: String): Int {
-        val streak = habitDao.getLatestStreak(habitId) ?: return 0
+    suspend fun getCurrentStreak(
+        userId: String,
+        habitId: String,
+    ): Int {
+        val streak = habitDao.getLatestStreak(userId, habitId) ?: return 0
         val lastLogged = LocalDate.parse(streak.lastDate)
         return if (lastLogged == LocalDate.now()) streak.streakLength else 0
     }
