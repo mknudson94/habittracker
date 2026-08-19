@@ -52,7 +52,9 @@ class NfcCheckInWorker
                     habitRepository.getHabit(it.uid, habitId).first()
                 }!!
             val alreadyCheckedIn = habitRepository.hasCheckedInToday(habitId = habitId)
-            val streakLength = habitRepository.getCurrentStreak(habitId)
+            val streakLength = auth.currentUser?.let {
+                habitRepository.getCurrentStreak(it.uid, habitId)
+            } ?: 0
 
             if (!alreadyCheckedIn) {
                 nfcCheckInHandler.checkIn(

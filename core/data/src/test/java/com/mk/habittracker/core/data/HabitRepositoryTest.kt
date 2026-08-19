@@ -29,6 +29,7 @@ class HabitRepositoryTest {
 
     @Before
     fun setup() {
+        every { auth.currentUser?.uid } returns "user1"
         repository = HabitRepository(habitDao, firestore, auth, testDispatcher)
     }
 

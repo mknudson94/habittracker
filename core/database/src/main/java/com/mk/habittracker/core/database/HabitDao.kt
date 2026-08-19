@@ -70,10 +70,12 @@ interface HabitDao {
 
     @Query(
         "DELETE FROM check_in " +
-            "WHERE completed_date = :date " +
+            "WHERE user_id = :userId " +
+            "AND completed_date = :date " +
             "AND habit_id = :habitId",
     )
     suspend fun deleteCheckIn(
+        userId: String,
         habitId: String,
         date: String,
     )
@@ -81,7 +83,10 @@ interface HabitDao {
     @Suppress("ktlint:standard:max-line-length")
     @Query(
         "WITH " +
-            "deduped AS (SELECT DISTINCT completed_date FROM check_in WHERE habit_id = :habitId), " +
+            "deduped AS (" +
+            "SELECT DISTINCT completed_date FROM check_in " +
+            "WHERE habit_id = :habitId AND user_id = :userId" +
+            "), " +
             "dated_rows AS (SELECT completed_date, " +
             "CAST(julianday(completed_date) AS INTEGER) - ROW_NUMBER() OVER (ORDER BY completed_date) AS island " +
             "FROM deduped), " +
@@ -90,5 +95,8 @@ interface HabitDao {
             "SELECT lastDate, streakLength FROM streak_groups " +
             "WHERE lastDate = (SELECT MAX(lastDate) FROM streak_groups)",
     )
-    suspend fun getLatestStreak(habitId: String): StreakEntity?
+    suspend fun getLatestStreak(
+        userId: String,
+        habitId: String,
+    ): StreakEntity?
 }

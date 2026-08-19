@@ -9,3 +9,6 @@
 .externalNativeBuild
 .cxx
 /app/google-services.json
+
+# Built variants
+/app/release
