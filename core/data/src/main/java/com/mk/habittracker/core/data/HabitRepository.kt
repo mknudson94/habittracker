@@ -2,6 +2,7 @@ package com.mk.habittracker.core.data
 
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.Blob
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.mk.habittracker.core.database.HabitDao
@@ -56,7 +57,7 @@ class HabitRepository @Inject constructor(
                         .get()
                         .await()
 
-                val habits = result.documents.map { Habit.from(id = it.id, data = it.data) }
+                val habits = result.documents.map { it.data!!.toHabit(id = it.id) }
                 habitDao.addHabits(habits.map { it.asEntity() })
             } catch (e: FirebaseFirestoreException) {
                 Log.e("HabitRepository", "Error pulling habits", e)
@@ -205,3 +206,19 @@ class HabitRepository @Inject constructor(
         }
     }
 }
+
+internal fun Habit.toMap(): Map<String, Any?> = mapOf(
+    "id" to id,
+    "user_id" to userId,
+    "name" to name,
+    "created_at" to createdAt,
+    "tag_id" to tagId?.let { Blob.fromBytes(it) },
+)
+
+internal fun Map<String, Any?>.toHabit(id: String) = Habit(
+    id = id,
+    userId = get("user_id") as? String ?: error("couldn't read user_id"),
+    name = get("name") as? String ?: error("couldn't read name"),
+    createdAt = get("created_at") as? Long ?: error("couldn't read created_at"),
+    tagId = (get("tag_id") as? Blob)?.toBytes(),
+)

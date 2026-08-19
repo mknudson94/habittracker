@@ -13,7 +13,7 @@ data class HabitEntity(
     @ColumnInfo(name = "user_id") val userId: String,
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "created_at") val createdAt: Long,
-    @ColumnInfo(name = "tag_id") val tagId: ByteArray?,
+    @ColumnInfo(name = "tag_id", typeAffinity = ColumnInfo.BLOB) val tagId: ByteArray?,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

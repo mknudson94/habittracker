@@ -112,6 +112,7 @@ fun createMockTag(message: NdefMessage? = null): Tag {
         ) as Tag
 }
 
+@Suppress("DEPRECATION")
 fun Intent?.asString(): String {
     if (this == null) return ""
     val sb = StringBuilder()
@@ -127,7 +128,7 @@ fun Intent?.asString(): String {
             sb
                 .append(key)
                 .append("=")
-                .append(extras.getString(key))
+                .append(extras.get(key))
                 .append(" ")
         }
     }
