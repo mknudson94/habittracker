@@ -5,11 +5,15 @@ import com.google.common.truth.Truth.assertThat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.mk.habittracker.core.data.HabitRepository
+import com.mk.habittracker.core.data.OnboardingPrefs
 import com.mk.habittracker.core.model.CheckIn
 import com.mk.habittracker.core.model.Habit
 import io.mockk.coVerify
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
+import io.mockk.runs
+import io.mockk.slot
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -30,6 +34,7 @@ import kotlin.uuid.ExperimentalUuidApi
 class MainScreenViewModelTest {
     private val repository: HabitRepository = mockk(relaxed = true)
     private val auth: FirebaseAuth = mockk()
+    private val onboardingPrefs: OnboardingPrefs = mockk(relaxed = true)
     private val firebaseUser: FirebaseUser = mockk()
     private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -47,8 +52,9 @@ class MainScreenViewModelTest {
         every { auth.currentUser } returns firebaseUser
         every { firebaseUser.uid } returns userId
         every { repository.getHabits(userId) } returns flowOf(habitsList)
+        every { auth.addAuthStateListener(any()) } just runs
 
-        viewModel = MainScreenViewModel(repository, auth)
+        viewModel = MainScreenViewModel(repository, auth, onboardingPrefs)
     }
 
     @After
@@ -106,7 +112,7 @@ class MainScreenViewModelTest {
         every { repository.getHabits("anonymous") } returns flowOf(emptyList())
 
         // Re-init to use the new auth state
-        val vm = MainScreenViewModel(repository, auth)
+        val vm = MainScreenViewModel(repository, auth, onboardingPrefs)
 
         vm.habits.test {
             assertThat(awaitItem()).isEmpty()
@@ -116,6 +122,62 @@ class MainScreenViewModelTest {
 
         coVerify {
             repository.addCheckIn(match { it.userId == "anonymous" })
+        }
+    }
+
+    @Test
+    fun `shouldShowTooltip is true when no habits and onboarding not done`() = runTest {
+        every { repository.getHabits(userId) } returns flowOf(emptyList())
+        every { onboardingPrefs.hasCreatedFirstHabit } returns flowOf(false)
+
+        val vm = MainScreenViewModel(repository, auth, onboardingPrefs)
+
+        vm.shouldShowTooltip.test {
+            assertThat(awaitItem()).isTrue()
+        }
+    }
+
+    @Test
+    fun `shouldShowTooltip is false when habits exist`() = runTest {
+        every { repository.getHabits(userId) } returns flowOf(habitsList)
+        every { onboardingPrefs.hasCreatedFirstHabit } returns flowOf(false)
+
+        val vm = MainScreenViewModel(repository, auth, onboardingPrefs)
+
+        vm.shouldShowTooltip.test {
+            assertThat(awaitItem()).isFalse()
+        }
+    }
+
+    @Test
+    fun `shouldShowTooltip is false when onboarding done`() = runTest {
+        every { repository.getHabits(userId) } returns flowOf(emptyList())
+        every { onboardingPrefs.hasCreatedFirstHabit } returns flowOf(true)
+
+        val vm = MainScreenViewModel(repository, auth, onboardingPrefs)
+
+        vm.shouldShowTooltip.test {
+            assertThat(awaitItem()).isFalse()
+        }
+    }
+
+    @Test
+    fun `habits flow updates when auth state changes`() = runTest {
+        val listenerSlot = slot<FirebaseAuth.AuthStateListener>()
+        every { auth.addAuthStateListener(capture(listenerSlot)) } just runs
+
+        val vm = MainScreenViewModel(repository, auth, onboardingPrefs)
+
+        vm.habits.test {
+            assertThat(awaitItem()).isEqualTo(habitsList) // Initial
+
+            // Simulate logout
+            every { auth.currentUser } returns null
+            every { repository.getHabits("anonymous") } returns flowOf(emptyList())
+
+            listenerSlot.captured.onAuthStateChanged(auth)
+
+            assertThat(awaitItem()).isEmpty()
         }
     }
 }

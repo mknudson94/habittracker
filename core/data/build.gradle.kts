@@ -33,6 +33,8 @@ dependencies {
 
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
+    implementation(libs.hilt.android)
+    implementation(libs.androidx.datastore.preferences)
     implementation(platform(libs.firebase.bom))
 
     testImplementation(libs.junit)

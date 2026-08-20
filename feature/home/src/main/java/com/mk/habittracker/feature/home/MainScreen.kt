@@ -16,11 +16,18 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
+import androidx.compose.material3.RichTooltip
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipAnchorPosition
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
@@ -33,6 +40,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mk.habittracker.core.model.Habit
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -45,8 +53,10 @@ fun MainScreen(
     vm: MainScreenViewModel = hiltViewModel(),
 ) {
     val habits by vm.habits.collectAsStateWithLifecycle()
+    val shouldShowTooltip by vm.shouldShowTooltip.collectAsStateWithLifecycle()
     MainScreen(
         habits = habits,
+        shouldShowTooltip = shouldShowTooltip,
         modifier = modifier,
         onAddHabit = onAddHabit,
         onLogout = onLogout,
@@ -63,11 +73,27 @@ fun MainScreen(
 @Composable
 fun MainScreen(
     habits: ImmutableList<Habit>,
+    shouldShowTooltip: Boolean,
     modifier: Modifier = Modifier,
     onAddHabit: () -> Unit = {},
     onLogout: () -> Unit = {},
     habitRow: @Composable (Habit) -> Unit,
 ) {
+    val scope = rememberCoroutineScope()
+    val tooltipState = rememberTooltipState(
+        initialIsVisible = shouldShowTooltip,
+        isPersistent = true,
+    )
+    // compose bug - sometimes initialIsVisible doesn't actually show the tooltip on first render
+    LaunchedEffect(shouldShowTooltip) {
+        scope.launch {
+            if (shouldShowTooltip) {
+                tooltipState.show()
+            } else {
+                tooltipState.dismiss()
+            }
+        }
+    }
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -86,33 +112,47 @@ fun MainScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = onAddHabit,
+            TooltipBox(
+                positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
+                    positioning = TooltipAnchorPosition.Above,
+                ),
+                tooltip = {
+                    RichTooltip(
+                        title = { Text("Start your first habit") },
+                        caretShape = TooltipDefaults.caretShape(),
+                        text = {
+                            Text("Tap here to create a habit and start tracking your progress.")
+                        },
+                    )
+                },
+                state = tooltipState,
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.outline_add_24),
-                    contentDescription = "add habit",
-                )
+                FloatingActionButton(
+                    onClick = onAddHabit,
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.outline_add_24),
+                        contentDescription = "add habit",
+                    )
+                }
             }
         },
     ) { paddingValues ->
         Column(
-            modifier =
-                Modifier
-                    .padding(paddingValues)
-                    .padding(horizontal = 16.dp)
-                    .verticalScroll(rememberScrollState())
-                    .fillMaxSize(),
+            modifier = Modifier
+                .padding(paddingValues)
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState())
+                .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Column(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .background(
-                            color = MaterialTheme.colorScheme.primaryContainer,
-                            shape = RoundedCornerShape(8.dp),
-                        ).padding(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                        shape = RoundedCornerShape(8.dp),
+                    ).padding(8.dp),
             ) {
                 Image(
                     painter = painterResource(R.drawable.hero_doodle),
@@ -132,10 +172,6 @@ fun MainScreen(
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                     )
-                    Text(
-                        text = "0 of 3 habits done today",
-                        style = MaterialTheme.typography.headlineSmall,
-                    )
                 }
             }
             habits.forEach { habit ->
@@ -151,21 +187,21 @@ fun MainScreen(
 @Composable
 private fun MainScreenPreview() {
     MainScreen(
-        habits =
-            persistentListOf(
-                Habit(
-                    id = "1",
-                    userId = "1",
-                    name = "Drink water",
-                    createdAt = 0L,
-                ),
-                Habit(
-                    id = "2",
-                    userId = "1",
-                    name = "Exercise",
-                    createdAt = 0L,
-                ),
+        habits = persistentListOf(
+            Habit(
+                id = "1",
+                userId = "1",
+                name = "Drink water",
+                createdAt = 0L,
             ),
+            Habit(
+                id = "2",
+                userId = "1",
+                name = "Exercise",
+                createdAt = 0L,
+            ),
+        ),
+        shouldShowTooltip = true,
         habitRow = { habit ->
             HabitCard(
                 habit = habit,

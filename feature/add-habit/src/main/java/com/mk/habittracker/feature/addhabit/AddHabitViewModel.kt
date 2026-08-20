@@ -15,36 +15,34 @@ import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
 @HiltViewModel
-class AddHabitViewModel
-    @Inject
-    constructor(
-        private val repository: HabitRepository,
-        private val auth: FirebaseAuth,
-    ) : ViewModel() {
-        val habitId = Uuid.random().toString()
-        val name = TextFieldState()
-        var tagId by mutableStateOf<ByteArray?>(null)
-            private set
+class AddHabitViewModel @Inject constructor(
+    private val repository: HabitRepository,
+    private val auth: FirebaseAuth,
+) : ViewModel() {
+    val habitId = Uuid.random().toString()
+    val name = TextFieldState()
+    var tagId by mutableStateOf<ByteArray?>(null)
+        private set
 
-        private val userId: String
-            get() = auth.currentUser?.uid ?: "anonymous"
+    private val userId: String
+        get() = auth.currentUser?.uid ?: "anonymous"
 
-        fun onTagPaired(id: ByteArray) {
-            tagId = id
-        }
-
-        suspend fun saveHabit() {
-            repository.addHabit(
-                Habit(
-                    id = habitId,
-                    userId = userId,
-                    name = name.text.toString(),
-                    createdAt =
-                        java.time.Instant
-                            .now()
-                            .toEpochMilli(),
-                    tagId = tagId,
-                ),
-            )
-        }
+    fun onTagPaired(id: ByteArray) {
+        tagId = id
     }
+
+    suspend fun saveHabit() {
+        repository.addHabit(
+            Habit(
+                id = habitId,
+                userId = userId,
+                name = name.text.toString(),
+                createdAt =
+                    java.time.Instant
+                        .now()
+                        .toEpochMilli(),
+                tagId = tagId,
+            ),
+        )
+    }
+}

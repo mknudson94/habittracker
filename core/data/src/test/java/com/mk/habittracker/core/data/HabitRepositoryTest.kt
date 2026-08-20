@@ -24,13 +24,14 @@ class HabitRepositoryTest {
     private val habitDao: HabitDao = mockk(relaxed = true)
     private val firestore: FirebaseFirestore = mockk(relaxed = true)
     private val auth: FirebaseAuth = mockk(relaxed = true)
+    private val onboardingPrefs: OnboardingPrefs = mockk(relaxed = true)
     private val testDispatcher = UnconfinedTestDispatcher()
     private lateinit var repository: HabitRepository
 
     @Before
     fun setup() {
         every { auth.currentUser?.uid } returns "user1"
-        repository = HabitRepository(habitDao, firestore, auth, testDispatcher)
+        repository = HabitRepository(habitDao, firestore, auth, onboardingPrefs, testDispatcher)
     }
 
     @After
@@ -67,5 +68,15 @@ class HabitRepositoryTest {
             repository.addHabit(habit)
 
             coVerify { habitDao.addHabit(match { it.id == "1" }) }
+        }
+
+    @Test
+    fun `addHabit calls onboardingPrefs setHasCreatedFirstHabit`() =
+        runTest {
+            val habit = Habit("1", "user1", "Habit 1", 1000L, null)
+
+            repository.addHabit(habit)
+
+            coVerify { onboardingPrefs.setHasCreatedFirstHabit() }
         }
 }
