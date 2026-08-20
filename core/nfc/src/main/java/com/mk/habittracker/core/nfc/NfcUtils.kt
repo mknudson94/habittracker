@@ -14,7 +14,7 @@ import android.util.Log
  */
 fun Intent.parseHabitTrackerNdef(): HabitTrackerNdef? {
     if (action != NfcAdapter.ACTION_NDEF_DISCOVERED) {
-        Log.w("Nfc", "intent is not of type ACTION_NDEF_DISCOVERED")
+        Log.w("Nfc", "intent is of type $action")
         return null
     }
     val tagId = getByteArrayExtra(NfcAdapter.EXTRA_ID)
