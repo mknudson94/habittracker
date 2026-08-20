@@ -30,6 +30,7 @@ class HabitRepository @Inject constructor(
     private val habitDao: HabitDao,
     private val db: FirebaseFirestore,
     private val auth: FirebaseAuth,
+    private val onboardingPrefs: OnboardingPrefs,
     ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
     private val scope = CoroutineScope(SupervisorJob() + ioDispatcher)
@@ -67,6 +68,7 @@ class HabitRepository @Inject constructor(
 
     suspend fun addHabit(habit: Habit) {
         habitDao.addHabit(habit.asEntity())
+        onboardingPrefs.setHasCreatedFirstHabit()
 
         val currentUserId = auth.currentUser?.uid
         if (currentUserId != habit.userId) {
