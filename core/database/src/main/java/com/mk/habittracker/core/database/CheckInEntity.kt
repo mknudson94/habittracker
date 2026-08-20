@@ -9,7 +9,7 @@ import java.time.LocalDate
 // TODO: maybe store julian days for better indexing/sorting
 @Entity(
     tableName = "check_in",
-    primaryKeys = ["id", "completed_date"],
+    primaryKeys = ["user_id", "habit_id", "completed_date"],
     foreignKeys = [
         ForeignKey(
             entity = HabitEntity::class,

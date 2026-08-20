@@ -55,7 +55,7 @@ interface HabitDao {
         "SELECT * FROM check_in " +
             "WHERE :habitId = check_in.habit_id " +
             "AND :userId = check_in.user_id " +
-            "AND date('now') = date(check_in.completed_date)",
+            "AND date('now', 'localtime') = date(check_in.completed_date)",
     )
     suspend fun getCheckInForToday(
         userId: String,
