@@ -1,10 +1,14 @@
 package com.mk.habittracker.feature.auth
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.TextObfuscationMode.Companion.RevealLastTyped
 import androidx.compose.foundation.text.input.TextObfuscationMode.Companion.Visible
@@ -13,6 +17,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SecureTextField
 import androidx.compose.material3.Text
@@ -25,6 +30,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
@@ -45,6 +52,7 @@ fun SignupScreen(
     SignupScreen(
         onCancel = onCancel,
         onSignup = viewModel::signUp,
+        onSignupWithGoogle = viewModel::signInWithGoogle,
         modifier = modifier,
     )
 }
@@ -53,11 +61,13 @@ fun SignupScreen(
 fun SignupScreen(
     onCancel: () -> Unit,
     onSignup: (email: String, password: String) -> Unit,
+    onSignupWithGoogle: (Context) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val email = TextFieldState("")
     val password = TextFieldState("")
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     Scaffold(
         modifier = modifier,
@@ -106,10 +116,17 @@ fun SignupScreen(
                 Text("or")
                 HorizontalDivider(Modifier.weight(1f))
             }
-            Button(
+            OutlinedButton(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = {},
+                onClick = { onSignupWithGoogle(context) },
             ) {
+                Icon(
+                    painter = painterResource(R.drawable.google),
+                    contentDescription = "google logo",
+                    tint = Color.Unspecified,
+                    modifier = Modifier.size(24.dp),
+                )
+                Spacer(Modifier.width(8.dp))
                 Text("Continue with Google")
             }
             val annotatedText =
@@ -176,5 +193,6 @@ private fun SignupScreenPreview() {
     SignupScreen(
         onCancel = {},
         onSignup = { _, _ -> },
+        onSignupWithGoogle = {},
     )
 }
