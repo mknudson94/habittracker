@@ -14,45 +14,43 @@ import org.json.JSONObject
 import java.security.SecureRandom
 import javax.inject.Inject
 
-class GoogleSignInManager
-    @Inject
-    constructor(
-        @ApplicationContext context: Context,
-    ) {
-        private val credentialManager = CredentialManager.create(context)
+class GoogleSignInManager @Inject constructor(
+    @ApplicationContext context: Context,
+    @WebClientId private val webClientId: String,
+) {
+    private val credentialManager = CredentialManager.create(context)
 
-        suspend fun requestGoogleCredential(
-            context: Context,
-            filterByAuthorizedAccounts: Boolean,
-            autoSelect: Boolean = false,
-        ): String {
-            val nonce = generateSecureRandomNonce()
-            val option =
-                GetGoogleIdOption
-                    .Builder()
-                    .setFilterByAuthorizedAccounts(filterByAuthorizedAccounts)
-                    .setServerClientId(
-                        "343615861912-t7f2fdp3ruego4f17o1pq1j51t8vi24l.apps.googleusercontent.com",
-                    ).setAutoSelectEnabled(autoSelect)
-                    .setNonce(nonce)
-                    .build()
-            val request = GetCredentialRequest.Builder().addCredentialOption(option).build()
-            val credential =
-                credentialManager.getCredential(context = context, request = request).credential
-            val token = GoogleIdTokenCredential.createFrom(credential.data).idToken
-            check(nonce == extractNonceFromIdToken(token))
-            return token
-        }
+    suspend fun requestGoogleCredential(
+        context: Context,
+        filterByAuthorizedAccounts: Boolean,
+        autoSelect: Boolean = false,
+    ): String {
+        val nonce = generateSecureRandomNonce()
+        val option =
+            GetGoogleIdOption
+                .Builder()
+                .setFilterByAuthorizedAccounts(filterByAuthorizedAccounts)
+                .setServerClientId(webClientId)
+                .setAutoSelectEnabled(autoSelect)
+                .setNonce(nonce)
+                .build()
+        val request = GetCredentialRequest.Builder().addCredentialOption(option).build()
+        val credential =
+            credentialManager.getCredential(context = context, request = request).credential
+        val token = GoogleIdTokenCredential.createFrom(credential.data).idToken
+        check(nonce == extractNonceFromIdToken(token))
+        return token
+    }
 
-        suspend fun clearCredentials() {
-            try {
-                val clearRequest = ClearCredentialStateRequest()
-                credentialManager.clearCredentialState(clearRequest)
-            } catch (e: ClearCredentialException) {
-                Log.e("Sign In", "Couldn't clear user credentials: ${e.localizedMessage}")
-            }
+    suspend fun clearCredentials() {
+        try {
+            val clearRequest = ClearCredentialStateRequest()
+            credentialManager.clearCredentialState(clearRequest)
+        } catch (e: ClearCredentialException) {
+            Log.e("Sign In", "Couldn't clear user credentials: ${e.localizedMessage}")
         }
     }
+}
 
 fun generateSecureRandomNonce(byteLength: Int = 32): String {
     val randomBytes = ByteArray(byteLength)
